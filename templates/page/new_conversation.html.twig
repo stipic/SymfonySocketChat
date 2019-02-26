@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create new conversation{% endblock %}
+
+{% block body %}
+    <h1>New conversation</h1>
+
+    {{ form_start(conversationForm) }}
+        {{ form_row(conversationForm.name) }}
+        {{ form_row(conversationForm.users) }}
+        <button class="btn">Create</button>
+    {{ form_end(conversationForm) }}
+{% endblock %}
