@@ -18,4 +18,6 @@ return [
     Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle::class => ['all' => true],
     Symfony\WebpackEncoreBundle\WebpackEncoreBundle::class => ['all' => true],
     Craue\ConfigBundle\CraueConfigBundle::class => ['all' => true],
+    Gos\Bundle\WebSocketBundle\GosWebSocketBundle::class => ['all' => true],
+    Gos\Bundle\PubSubRouterBundle\GosPubSubRouterBundle::class => ['all' => true],
 ];

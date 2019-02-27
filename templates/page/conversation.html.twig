@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{% block stylesheets %}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
 {% block body %}
     
     <div><a href="/">Back to conversations</a></div>
@@ -21,4 +25,10 @@
         {% endfor %}
     </ul>
 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
+    <script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}

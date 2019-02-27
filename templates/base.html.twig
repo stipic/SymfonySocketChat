@@ -7,10 +7,11 @@
     </head>
     <body>
         {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
 
         {% if app.user.username is defined %}
             <div><a href="/logout">Logout {{ app.user.username }}</a></div>
         {% endif %}
+
+        {% block javascripts %}{% endblock %}
     </body>
 </html>

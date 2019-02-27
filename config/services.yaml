@@ -33,3 +33,8 @@ services:
             - '%kernel.cache_dir%'
             - 'craue_config'
             - 0
+
+    app_conversation_socket:
+        class: App\Socket\ConversationSocket
+        tags:
+            - { name: gos_web_socket.topic }

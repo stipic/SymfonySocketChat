@@ -1,0 +1,7 @@
+app_topic_chat:
+    channel: 'conversation/{conversationId}'
+    handler:
+        callback: 'acme.topic' #related to the getName() of your topic
+    requirements:
+        conversationId:
+            pattern: '\d+' #accept all valid regex, don't put delimiters !
