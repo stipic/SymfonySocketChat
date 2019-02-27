@@ -13,6 +13,7 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 /**
  * @ORM\Table(name="messages")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class Message
 {
@@ -229,5 +230,13 @@ class Message
         $this->content = $content;
 
         return $this;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersistSetCreatedAt()
+    {
+        $this->createdAt = new \DateTime();
     }
 }

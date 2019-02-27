@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Table(name="conversations")
  * @ORM\Entity
+ * @ORM\HasLifecycleCallbacks()
  */
 class Conversation
 {
@@ -277,31 +278,11 @@ class Conversation
     }
 
     /**
-     * Set the value of messages
-     */ 
-    public function setMessages($messages)
-    {
-        $this->messages = $messages;
-    }
-
-    /**
      * Get the value of users
      */ 
     public function getUsers()
     {
         return $this->users;
-    }
-
-    /**
-     * Set the value of users
-     *
-     * @return  self
-     */ 
-    public function setUsers($users)
-    {
-        $this->users = $users;
-
-        return $this;
     }
 
     public function addUserToConversation(\App\Entity\User $user)
@@ -310,5 +291,13 @@ class Conversation
         $this->users->add($user);
 
         return $this->users;
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersistSetCreatedAt()
+    {
+        $this->createdAt = new \DateTime();
     }
 }

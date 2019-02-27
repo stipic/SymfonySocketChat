@@ -35,7 +35,6 @@ class ConversationController extends Controller
 
             $conversation->setName($name);
             $conversation->setCreatedBy($this->getUser());
-            $conversation->setCreatedAt(new \DateTime());
             $conversation->setIsChannel(true);
             $conversation->setDeleted(false);
 
@@ -58,14 +57,11 @@ class ConversationController extends Controller
     }
 
     /**
-     * @Route("/conversation/{conversationId}", name="app_conversation")
+     * @Route("/conversation/{id}", name="app_conversation")
      * @Method({"GET"})
      */
-    public function conversation(Request $request, $conversationId)
+    public function conversation(Conversation $conversation, Request $request)
     {
-        $conversationRepository = $this->get('doctrine')->getManager()->getRepository('App:Conversation');
-        $conversation = $conversationRepository->findOneById($conversationId);
-
         $this->denyAccessUnlessGranted('access', $conversation);
 
         //@todo ovo za svaku poruku radi novi SQL upit, trebalo bi kreirati repositoryMetodu koja jednim pozivom dohvaca.

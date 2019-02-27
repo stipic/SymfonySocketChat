@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class User implements UserInterface, \Serializable
 {
@@ -197,5 +198,13 @@ class User implements UserInterface, \Serializable
             $this->password,
             // $this->salt
         ) = unserialize($serialized);
-    }  
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersistSetCreatedAt()
+    {
+        $this->createdAt = new \DateTime();
+    }
 }

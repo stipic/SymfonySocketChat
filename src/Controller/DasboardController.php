@@ -17,7 +17,9 @@ class DasboardController extends Controller
 
         $userRepository = $this->get('doctrine')->getManager()->getRepository('App:User');
         $users = $userRepository->findAll();
-        
+
+        $this->get('craue_config')->set('register', 0);
+
         return $this->render('page/dashboard.html.twig', [
             'conversations' => $userConversations,
             'users' => $users

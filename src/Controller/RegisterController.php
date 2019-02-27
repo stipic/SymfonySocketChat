@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 
-class SecurityController extends AbstractController
+class RegisterController extends AbstractController
 {
     /**
      * @var \Twig_Environment
@@ -65,32 +65,5 @@ class SecurityController extends AbstractController
         return $this->render('security/register.html.twig', [
             'registrationForm' => $form->createView(),
         ]);
-    }
-
-    /**
-     * @Route("/login", name="security_login")
-     */
-    public function login(AuthenticationUtils $authenticationUtils, AuthorizationCheckerInterface $authChecker)
-    {
-        if($authChecker->isGranted('ROLE_USER'))
-        {
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        return new Response($this->twig->render(
-            'security/login.html.twig',
-            [
-                'last_username' => $authenticationUtils->getLastUsername(),
-                'error' => $authenticationUtils->getLastAuthenticationError()
-            ]
-        ));
-    }
-
-    /**
-     * @Route("/logout", name="security_logout")
-     */
-    public function logout()
-    {
-
     }
 }
