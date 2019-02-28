@@ -1,6 +1,6 @@
 gos_web_socket:
     server:
-        port: 8080
+        port: 5510
         host: 127.0.0.1
         router:
            resources:
