@@ -135,6 +135,13 @@ class User implements UserInterface, \Serializable
     {
     }
 
+    public function addGroup(\App\Entity\Group $group)
+    {
+        $this->groups[] = $group;
+
+        return $this;
+    }
+
     public function getRoles()
     {
         return $this->groups->toArray();
