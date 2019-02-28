@@ -1,6 +1,10 @@
 require('../css/app.css');
 
-var webSocket = WS.connect("ws://" + window.location.hostname + ":8080");
+
+var host = window.location.hostname;
+host = '5.189.166.104';
+
+var webSocket = WS.connect("ws://" + host + ":8080");
 
 webSocket.on("socket/connect", function(session) {
 
