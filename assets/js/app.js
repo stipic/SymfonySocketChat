@@ -4,7 +4,7 @@ require('../css/app.css');
 var host = window.location.hostname;
 // host = '5.189.166.104';
 
-var webSocket = WS.connect("ws://" + host + ":5510");
+var webSocket = WS.connect("ws://" + host + "");
 
 webSocket.on("socket/connect", function(session) {
 
