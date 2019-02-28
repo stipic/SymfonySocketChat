@@ -1,0 +1,13 @@
+gos_web_socket:
+    server:
+        port: 5510
+        host: 127.0.0.1
+        router:
+           resources:
+               - '%kernel.project_dir%/config/pubsub.yml'
+        origin_check: false
+    client:
+        firewall: main
+        session_handler: app_session_db_storage
+    # origins:
+    #     - '%origin%'

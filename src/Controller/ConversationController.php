@@ -72,7 +72,7 @@ class ConversationController extends Controller
 
         return $this->render('page/conversation.html.twig', [
             'messages' => $conversationMessages,
-            'conversationId' => $conversation->getId(),
+            'conversation' => $conversation,
             'users' => $users
         ]);
     }

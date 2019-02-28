@@ -22,7 +22,14 @@
     </div>
 
 
-    <div>Users:</div>
+    <div>Users in conversation:</div>
+    <ul>
+        {% for user in conversation.getUsers() %}
+            <li>{{ user.username }}</li>
+        {% endfor %}
+    </ul>
+
+    <div>Available users:</div>
     <ul>
         {% for user in users %}
             <li>{{ user.username }}</li>
@@ -35,8 +42,8 @@
     <script type="text/javascript">
         var clientInformation = {
             username: '{{ app.user.username }}',
-            wsConversationRoute: 'conversation/{{ conversationId }}',
-            conversationId: {{ conversationId}},
+            wsConversationRoute: 'conversation/{{ conversation.id }}',
+            conversationId: {{ conversation.id }},
             displayName: '{{ app.user.displayName }}'
         };
     </script>
