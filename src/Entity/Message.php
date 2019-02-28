@@ -38,7 +38,6 @@ class Message
     /**
      * @var string $createdBy
      *
-     * @Gedmo\Blameable(on="create")
 	 * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
      */
@@ -96,7 +95,7 @@ class Message
      *
      * @return  self
      */ 
-    public function setConversationId($conversation)
+    public function setConversation($conversation)
     {
         $this->conversation = $conversation;
 

@@ -5,3 +5,9 @@ gos_web_socket:
         router:
            resources:
                - '%kernel.project_dir%/config/pubsub.yml'
+        origin_check: false
+    client:
+        firewall: main
+        session_handler: app_session_db_storage
+    # origins:
+    #     - '%origin%'

@@ -24,8 +24,12 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    app_session_db_storage:
+        class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        arguments:
+            - !service { class: PDO, factory: 'database_connection:getWrappedConnection' }
+            - {lock_mode: 0}
+
     craue_config_cache_provider:
         class: Doctrine\Common\Cache\FilesystemCache
         public: false
@@ -36,5 +40,6 @@ services:
 
     app_conversation_socket:
         class: App\Socket\ConversationSocket
+        arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager']
         tags:
             - { name: gos_web_socket.topic }

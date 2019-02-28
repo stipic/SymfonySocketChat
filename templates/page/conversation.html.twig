@@ -7,15 +7,19 @@
 {% block body %}
     
     <div><a href="/">Back to conversations</a></div>
-    <ul>
+    <ul id="chat-list">
         {% for message in messages %}
 
-            <li>[{{ message.getCreatedBy().getUsername() }} at {{ message.getCreatedAt() | date('d.m.Y H:i:s') }}]: <b>{{ message.content }}</b></li>
+            <li>{{ message.getCreatedBy().getDisplayName() == app.user.displayName ? 'me' : message.getCreatedBy().getDisplayName() }}: {{ message.content }}</li>
         
         {% endfor %}
     </ul>
 
-    <div><textarea id="message"></textarea><button type="submit">Send</button></div>
+    <div>
+        <textarea id="form-message" placeholder="Your public message here"></textarea>
+        <input type="button" id="form-submit" value="Send message"/>
+
+    </div>
 
 
     <div>Users:</div>
@@ -28,7 +32,15 @@
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
-    <script src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
+    <script type="text/javascript">
+        var clientInformation = {
+            username: '{{ app.user.username }}',
+            wsConversationRoute: 'conversation/{{ conversationId }}',
+            conversationId: {{ conversationId}},
+            displayName: '{{ app.user.displayName }}'
+        };
+    </script>
+    <script type="text/javascript" src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
     {{ encore_entry_script_tags('app') }}
 {% endblock %}
