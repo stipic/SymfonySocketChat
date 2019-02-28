@@ -2,6 +2,7 @@
 #    path: /
 #    controller: App\Controller\DefaultController::index
 
-craue_config_settings:
-  resource: "@CraueConfigBundle/Resources/config/routing/settings.xml"
-  prefix: /settings
+craue_config_settings_modify:
+  path: /admin/settings
+  defaults:
+    _controller: Craue\ConfigBundle\Controller\SettingsController::modifyAction

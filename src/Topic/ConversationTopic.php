@@ -1,5 +1,5 @@
 <?php
-namespace App\Socket;
+namespace App\Topic;
 
 use Gos\Bundle\WebSocketBundle\Topic\TopicInterface;
 use Gos\Bundle\WebSocketBundle\Router\WampRequest;
@@ -10,17 +10,23 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Ratchet\MessageComponentInterface;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
-class ConversationSocket implements TopicInterface, SecuredTopicInterface
+class ConversationTopic implements TopicInterface, SecuredTopicInterface
 {
     protected $clientManipulator;
 
     private $_em;
 
-    public function __construct(ClientManipulator $clientManipulator, EntityManager $em)
+    private $_authChecker;
+
+    private $_conversation;
+
+    public function __construct(ClientManipulator $clientManipulator, EntityManager $em, AuthorizationChecker $authChecker)
     {
         $this->clientManipulator = $clientManipulator;
         $this->_em = $em;
+        $this->_authChecker = $authChecker;
     }
 
     public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
@@ -30,7 +36,24 @@ class ConversationSocket implements TopicInterface, SecuredTopicInterface
             throw new FirewallRejectionException();
         }
 
-        // Provjeri dali korisnik ima permission na ovaj razgovor.
+        $pubSubRouteChunk = explode('/', $topic->getId());
+        $conversationId = isset($pubSubRouteChunk[1]) ? (int) $pubSubRouteChunk[1] : false;
+        if($conversationId === false)
+        {
+            // krivo sam rastavio pubsub rutu, izbaci korisnika prije nego dođe do problema
+            throw new FirewallRejectionException();
+        }
+
+        $this->_conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
+             'id' => $conversationId
+        ));
+
+        if(!$this->_authChecker->isGranted('access', $this->_conversation))
+        {
+            // korisnik nema prava pristupa ovom razgovoru.
+
+            throw new FirewallRejectionException();
+        }
     }
 
     /**
@@ -86,14 +109,11 @@ class ConversationSocket implements TopicInterface, SecuredTopicInterface
         {
             $userSessionId = $connection->WAMP->sessionId;
             $exclude = [$userSessionId];
-            $conversationId = $clientPayload->conversationId;
-            $conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
-                'id' => $conversationId
-            ));
+            
             $user = $this->clientManipulator->getClient($connection);
 
             $message = new \App\Entity\Message();
-            $message->setConversation($conversation);
+            $message->setConversation($this->_conversation);
             $message->setContent($clientPayload->message);
             $message->setCreatedBy($user);
             $message->setDeleted(false);
@@ -107,8 +127,6 @@ class ConversationSocket implements TopicInterface, SecuredTopicInterface
             //  * @param array $eligible A list of session Ids the message should be send to (whitelist)
             //  * @return Topic The same Topic object to chain
             //     public function broadcast($msg, array $exclude = array(), array $eligible = array());
-
-            
             $topic->broadcast($event, $exclude);
         }
         
@@ -120,6 +138,6 @@ class ConversationSocket implements TopicInterface, SecuredTopicInterface
     */
     public function getName()
     {
-        return 'acme.topic';
+        return 'conversation.topic';
     }
 }

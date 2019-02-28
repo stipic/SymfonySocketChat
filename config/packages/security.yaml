@@ -8,8 +8,8 @@ security:
 
     role_hierarchy:
         ROLE_USER: ROLE_USER
-        ROLE_ADMIN: [ROLE_USER, ROLE_ADMIN]
-        ROLE_SUPERADMIN: [ROLE_ADMIN, ROLE_SUPERADMIN]
+        ROLE_MODERATOR: [ROLE_USER, ROLE_MODERATOR]
+        ROLE_SUPERADMIN: [ROLE_MODERATOR, ROLE_SUPERADMIN]
 
     firewalls:
         dev:
@@ -33,5 +33,5 @@ security:
 
     access_control:
         - { path: ^/$, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_SUPERADMIN }
         - { path: ^(login|register)$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        # - { path: ^/profile, roles: ROLE_USER }

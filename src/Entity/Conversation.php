@@ -11,19 +11,19 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Table(name="conversations")
  * @ORM\Entity
+ * @ORM\Table(name="conversations")
  * @ORM\HasLifecycleCallbacks()
  */
 class Conversation
 {
     /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
+    
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      */

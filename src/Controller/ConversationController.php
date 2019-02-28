@@ -17,7 +17,7 @@ class ConversationController extends Controller
      */
     public function newConversation(Request $request)
     {
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('ROLE_MODERATOR');
 
         $conversation = new Conversation();
         $userRepository = $this->get('doctrine')->getManager()->getRepository('App:User');

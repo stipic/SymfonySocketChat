@@ -39,7 +39,7 @@ services:
             - 0
 
     app_conversation_socket:
-        class: App\Socket\ConversationSocket
-        arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager']
+        class: App\Topic\ConversationTopic
+        arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker']
         tags:
             - { name: gos_web_socket.topic }

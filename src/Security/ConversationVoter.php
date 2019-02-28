@@ -8,13 +8,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ConversationVoter extends Voter
 {
-    private const ROLE_ACCESS = 'access';
+    private const ACTION_ACCESS = 'access';
 
     protected function supports($attribute, $subject)
     {
         if(!in_array($attribute, [
-            self::ROLE_ACCESS]
-        )) 
+            self::ACTION_ACCESS
+        ])) 
         {
             return false;
         }
@@ -39,7 +39,7 @@ class ConversationVoter extends Voter
 
         switch($attribute) 
         {
-            case self::ROLE_ACCESS:
+            case self::ACTION_ACCESS:
                 return $this->canAccess($conversation, $user);
         }
 
@@ -52,7 +52,7 @@ class ConversationVoter extends Voter
         //treba napisati novu repository metodu s kojom cemo ovo provjeriti.
         foreach($conversation->getUsers()->getValues() as $allowedUser)
         {
-            if($allowedUser === $user)
+            if($allowedUser->getId() === $user->getId())
             {
                 return true;
             }

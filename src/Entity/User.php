@@ -7,9 +7,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="users")
  * @ORM\HasLifecycleCallbacks()
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
- * @ORM\HasLifecycleCallbacks()
  */
 class User implements UserInterface, \Serializable
 {

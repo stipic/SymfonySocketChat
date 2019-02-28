@@ -3,7 +3,7 @@
 {% block body %}
     
     Registracija: {{ craue_setting('register') }}
-    {% if is_granted('ROLE_ADMIN') %}
+    {% if is_granted('ROLE_MODERATOR') %}
         <div><a href="/conversation/new">Create new conversation</a></li></div>
     {% endif %}
     
