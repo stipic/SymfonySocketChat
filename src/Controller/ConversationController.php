@@ -30,12 +30,13 @@ class ConversationController extends Controller
 
         if($form->isSubmitted() && $form->isValid()) 
         {
-            $name = $form->get('name')->getData();
+            $name = $form->get('channelName')->getData();
             $selectedUsers = $form->get('users')->getData()->getValues();
 
-            $conversation->setName($name);
+            $conversation->setChannelName($name);
             $conversation->setCreatedBy($this->getUser());
             $conversation->setIsChannel(true);
+            $conversation->setIsChannelPublic(false);
             $conversation->setDeleted(false);
 
             $conversation->addUserToConversation($this->getUser());

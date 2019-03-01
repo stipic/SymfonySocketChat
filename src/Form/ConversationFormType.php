@@ -21,7 +21,7 @@ class ConversationFormType extends AbstractType
         $userId = $user->getId();
 
         $builder
-            ->add('name')
+            ->add('channelName')
             ->add('users', EntityType::class, array(
                 'required' => true,
                 'class' => User::class,

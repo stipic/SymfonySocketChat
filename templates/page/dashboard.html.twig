@@ -4,13 +4,23 @@
     
     {# Registracija: {{ craue_setting('register') }} #}
     {% if is_granted('ROLE_MODERATOR') %}
-        <div><a href="/conversation/new">Create new conversation</a></li></div>
+        <div><a href="/conversation/new">Create new channel</a></li></div>
     {% endif %}
     
     <ul>
         {% for conversation in conversations %}
 
-            <li><a href="/conversation/{{ conversation.id }}">{{ conversation.name }}</a>
+            {% if conversation.isChannel == false %}
+                {% set channelName = conversation.conversationNameForOwner %}
+                {% if conversation.createdBy != app.user %}
+                    {% set channelName = conversation.conversationNameForGuest %}
+                {% endif %}
+            {% else %}
+                {% set channelName = conversation.channelName %}
+            {% endif %}
+
+
+            <li><a href="/conversation/{{ conversation.id }}">{{ channelName }}</a>
         
         {% endfor %}
     </ul>

@@ -104,10 +104,9 @@ class AppFixtures extends Fixture
             {
                 if($firstUserKey !== $secondUserKey)
                 {
-                    $title = $users[$firstUserKey]['displayName'] . ' and ' . $users[$secondUserKey]['displayName'];
-
                     $conversation = new Conversation();
-                    $conversation->setName($title);
+                    $conversation->setConversationNameForGuest($users[$firstUserKey]['displayName']);
+                    $conversation->setConversationNameForOwner($users[$secondUserKey]['displayName']);
                     $conversation->setIsChannel(false);
                     $conversation->setDeleted(false);
 
