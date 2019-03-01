@@ -51,38 +51,57 @@ webSocket.on("socket/connect", function(session) {
     document.getElementById("form-message").addEventListener("input", function(){
         
         var msg = document.getElementById("form-message").value;
-
-        var writingNotification = clientInformation;
-        writingNotification.payloadType = 'writing';
-        writingNotification.message = msg;
-        session.publish(clientInformation.wsConversationRoute, JSON.stringify(writingNotification));
+        session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
 
     }, false);
 
     session.subscribe(clientInformation.wsConversationRoute, function(uri, payload) 
     {
         var responsePayload = JSON.parse(payload);
-        if(responsePayload.payloadType == 'writing')
-        {
-            $('#writing').html('');
-            for(var key in responsePayload.message) 
+        var message = responsePayload.message;
+        Chat.appendMessage(responsePayload, message);
+    });
+
+    session.subscribe('online', function(uri, payload) 
+    {
+        var responsePayload = JSON.parse(payload);
+        console.log(responsePayload);
+        
+        $('span[data-usid]').each(function(event) {
+
+            var userId = $(this).attr('data-usid');
+
+            $('span[data-usid="'+userId+'"]').html('[offline]');
+
+            for(var key in responsePayload)
             {
-                if(responsePayload.message.hasOwnProperty(key)) 
+                if(responsePayload.hasOwnProperty(key))
                 {
-                    var who = responsePayload.message[key].displayName;
-                    var doWhat = responsePayload.message[key].message;
-
-                    var message = who + ' ' + doWhat;
-
-                    $('#writing').append(document.createTextNode(message));
+                    if(key == userId)
+                    {
+                        $('span[data-usid="'+userId+'"]').html('[ONLINE]');
+                    }
                 }
             }
-        }
-        else 
+        });
+    });
+
+    session.subscribe(clientInformation.wsConversationRoute + '/notifications', function(uri, payload) 
+    {
+        var responsePayload = JSON.parse(payload);
+        $('#writing').html('');
+        for(var key in responsePayload) 
         {
-            var message = responsePayload.message;
-            Chat.appendMessage(responsePayload, message);
-        }
+            if(responsePayload.hasOwnProperty(key)) 
+            {
+                var who = responsePayload[key].displayName;
+                var doWhat = responsePayload[key].message;
+
+                var message = who + ' ' + doWhat;
+
+                $('#writing').append(document.createTextNode(message));
+            }
+        }   
     });
 
     console.log("Successfully Connected!");

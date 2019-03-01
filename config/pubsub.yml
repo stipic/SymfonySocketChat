@@ -5,3 +5,16 @@ app_topic_chat:
     requirements:
         conversationId:
             pattern: '\d+'
+
+app_topic_chat_writing_notification:
+    channel: 'conversation/{conversationId}/notifications'
+    handler:
+        callback: 'writing_notification.topic'
+    requirements:
+        conversationId:
+            pattern: '\d+'
+
+app_online_users:
+    channel: 'online'
+    handler:
+        callback: 'online_user.topic'

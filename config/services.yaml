@@ -44,6 +44,18 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
+    app_conversation_notification_socket:
+        class: App\Topic\ConversationNotificationTopic
+        arguments: ['@gos_web_socket.websocket.client_manipulator']
+        tags:
+            - { name: gos_web_socket.topic }
+
+    app_online_users_socket:
+        class: App\Topic\OnlineUserTopic
+        arguments: ['@gos_web_socket.websocket.client_manipulator']
+        tags:
+            - { name: gos_web_socket.topic }
+
     app_doctrine_periodic_ping:
         class: App\Topic\Periodic\DoctrinePeriodicPing
         arguments: ['@doctrine.dbal.default_connection']

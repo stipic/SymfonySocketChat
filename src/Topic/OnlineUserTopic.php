@@ -9,49 +9,23 @@ use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Ratchet\MessageComponentInterface;
-use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
-class ConversationTopic implements TopicInterface, SecuredTopicInterface
+class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
 {
     protected $clientManipulator;
 
-    private $_em;
+    private $_onlineUsers = array();
 
-    private $_authChecker;
-
-    private $_conversation;
-
-    public function __construct(ClientManipulator $clientManipulator, EntityManager $em, AuthorizationChecker $authChecker)
+    public function __construct(ClientManipulator $clientManipulator)
     {
         $this->clientManipulator = $clientManipulator;
-        $this->_em = $em;
-        $this->_authChecker = $authChecker;
     }
 
     public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
     {
         if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
         {
-            throw new FirewallRejectionException();
-        }
-
-        $pubSubRouteChunk = explode('/', $topic->getId());
-        $conversationId = isset($pubSubRouteChunk[1]) ? (int) $pubSubRouteChunk[1] : false;
-        if($conversationId === false)
-        {
-            // krivo sam rastavio pubsub rutu, izbaci korisnika prije nego dođe do problema
-            throw new FirewallRejectionException();
-        }
-
-        $this->_conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
-             'id' => $conversationId
-        ));
-
-        if(!$this->_authChecker->isGranted('access', $this->_conversation))
-        {
-            // korisnik nema prava pristupa ovom razgovoru.
-
             throw new FirewallRejectionException();
         }
     }
@@ -69,32 +43,6 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
-        $clientPayload = json_decode($event);
-        if(
-            isset($clientPayload->username) &&
-            isset($clientPayload->wsConversationRoute) &&
-            isset($clientPayload->displayName) &&
-            isset($clientPayload->message) &&
-            isset($clientPayload->conversationId) && 
-            isset($clientPayload->payloadType)
-        )
-        {
-            $userSessionId = $connection->WAMP->sessionId;
-            $exclude = [$userSessionId];
-            
-            $user = $this->clientManipulator->getClient($connection);
-
-            $message = new \App\Entity\Message();
-            $message->setConversation($this->_conversation);
-            $message->setContent($clientPayload->message);
-            $message->setCreatedBy($user);
-            $message->setDeleted(false);
-
-            $this->_em->merge($message);
-            $this->_em->flush();
-
-            $topic->broadcast(json_encode($clientPayload), $exclude);  
-        }
     }
 
     /**
@@ -107,6 +55,9 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
+        $user = $this->clientManipulator->getClient($connection);
+        $this->_onlineUsers[$user->getId()] = $user->getUsername();
+        $topic->broadcast(json_encode($this->_onlineUsers));
     }
 
     /**
@@ -119,6 +70,9 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
+        $user = $this->clientManipulator->getClient($connection);
+        unset($this->_onlineUsers[$user->getId()]);
+        $topic->broadcast(json_encode($this->_onlineUsers));
     }
 
     /**
@@ -127,6 +81,6 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
     */
     public function getName()
     {
-        return 'conversation.topic';
+        return 'online_user.topic';
     }
 }

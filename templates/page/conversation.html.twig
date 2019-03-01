@@ -31,12 +31,35 @@
         {% endfor %}
     </ul>
 
-    <div>Available users:</div>
-    <ul>
-        {% for user in users %}
-            <li>{{ user.username }}</li>
-        {% endfor %}
-    </ul>
+    <div>
+    {% for conversation in conversations %}
+
+        {% set userUuid = '' %}
+        {% if conversation.isChannel == false %}
+
+            {% set channelName = conversation.conversationNameForOwner %}
+            {% if conversation.createdBy != app.user %}
+                {% set channelName = conversation.conversationNameForGuest %}
+            {% endif %}
+
+            {% for userInsideThisConversation in conversation.users.getValues() %}
+                {% if userInsideThisConversation != app.user %}
+                    {% set userUuid = '<span data-usid=' ~ userInsideThisConversation.id ~ '>[offline]</span>' %}
+                {% endif %}
+            {% endfor %}
+            
+
+        {% else %}
+
+            {% set channelName = conversation.channelName %}
+
+        {% endif %}
+
+
+        <li>{{ userUuid | raw }}<a href="/conversation/{{ conversation.id }}">{{ channelName }}</a>
+    
+    {% endfor %}
+    </div>
 
 {% endblock %}
 

@@ -70,13 +70,16 @@ class ConversationController extends Controller
         //@todo ovo za svaku poruku radi novi SQL upit, trebalo bi kreirati repositoryMetodu koja jednim pozivom dohvaca.
         $conversationMessages = $conversation->getMessages()->getValues();
         
-        $userRepository = $this->get('doctrine')->getManager()->getRepository('App:User');
-        $users = $userRepository->findAll();
+        //@todo trebamo napraviti query koji ce nam vratiti:
+        // popis svih konverzacija od nekog usera i uz to vratiti 
+        // popis SVIH userId-eva koji su u tom razgovoru.
+
+        $userConversations = $this->getUser()->getConversations()->getValues();
 
         return $this->render('page/conversation.html.twig', [
             'messages' => $conversationMessages,
             'conversation' => $conversation,
-            'users' => $users
+            'conversations' => $userConversations
         ]);
     }
 }
