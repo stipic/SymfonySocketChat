@@ -43,3 +43,9 @@ services:
         arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker']
         tags:
             - { name: gos_web_socket.topic }
+
+    app_doctrine_periodic_ping:
+        class: App\Topic\Periodic\DoctrinePeriodicPing
+        arguments: ['@doctrine.dbal.default_connection']
+        tags:
+            - { name: gos_web_socket.periodic }
