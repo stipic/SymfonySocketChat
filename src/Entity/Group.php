@@ -117,12 +117,4 @@ class Group extends Role
 
         return $this;
     }
-
-    public function addUserToGroup(\App\Entity\User $user)
-    {
-        $user->addGroup($this);
-        $this->users->add($user);
-
-        return $this->users;
-    }
 }

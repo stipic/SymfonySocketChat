@@ -30,6 +30,8 @@ class ConversationController extends Controller
 
         if($form->isSubmitted() && $form->isValid()) 
         {
+            $entityManager = $this->getDoctrine()->getManager();
+
             $name = $form->get('channelName')->getData();
             $selectedUsers = $form->get('users')->getData()->getValues();
 
@@ -39,13 +41,13 @@ class ConversationController extends Controller
             $conversation->setIsChannelPublic(false);
             $conversation->setDeleted(false);
 
-            $conversation->addUserToConversation($this->getUser());
+            $this->getUser()->addConversation($conversation);
             foreach($selectedUsers as $user)
             {
-                $conversation->addUserToConversation($user);
+                $user->addConversation($conversation);
+                $entityManager->persist($user);
             }
 
-            $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($conversation);
             $entityManager->flush();
 
