@@ -1,6 +1,5 @@
 require('../css/app.css');
 
-
 var host = window.location.hostname;
 // host = '5.189.166.104';
 
@@ -49,11 +48,41 @@ webSocket.on("socket/connect", function(session) {
         document.getElementById("form-message").value = "";
     }, false);
 
+    document.getElementById("form-message").addEventListener("input", function(){
+        
+        var msg = document.getElementById("form-message").value;
+
+        var writingNotification = clientInformation;
+        writingNotification.payloadType = 'writing';
+        writingNotification.message = msg;
+        session.publish(clientInformation.wsConversationRoute, JSON.stringify(writingNotification));
+
+    }, false);
+
     session.subscribe(clientInformation.wsConversationRoute, function(uri, payload) 
     {
         var responsePayload = JSON.parse(payload);
-        var message = responsePayload.message;
-        Chat.appendMessage(responsePayload, message);
+        if(responsePayload.payloadType == 'writing')
+        {
+            $('#writing').html('');
+            for(var key in responsePayload.message) 
+            {
+                if(responsePayload.message.hasOwnProperty(key)) 
+                {
+                    var who = responsePayload.message[key].displayName;
+                    var doWhat = responsePayload.message[key].message;
+
+                    var message = who + ' ' + doWhat;
+
+                    $('#writing').append(document.createTextNode(message));
+                }
+            }
+        }
+        else 
+        {
+            var message = responsePayload.message;
+            Chat.appendMessage(responsePayload, message);
+        }
     });
 
     console.log("Successfully Connected!");

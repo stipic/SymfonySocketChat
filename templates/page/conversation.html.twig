@@ -15,6 +15,8 @@
         {% endfor %}
     </ul>
 
+    <div id="writing"></div>
+
     <div>
         <textarea id="form-message" placeholder="Your public message here"></textarea>
         <input type="button" id="form-submit" value="Send message"/>
@@ -41,6 +43,7 @@
 {% block javascripts %}
     <script type="text/javascript">
         var clientInformation = {
+            payloadType: 'text',
             username: '{{ app.user.username }}',
             wsConversationRoute: 'conversation/{{ conversation.id }}',
             conversationId: {{ conversation.id }},

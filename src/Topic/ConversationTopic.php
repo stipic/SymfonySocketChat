@@ -22,6 +22,8 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
 
     private $_conversation;
 
+    private $_usersWhoWriting = array();
+
     public function __construct(ClientManipulator $clientManipulator, EntityManager $em, AuthorizationChecker $authChecker)
     {
         $this->clientManipulator = $clientManipulator;
@@ -57,35 +59,6 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
     }
 
     /**
-     * This will receive any Subscription requests for this topic.
-     *
-     * @param ConnectionInterface $connection
-     * @param Topic $topic
-     * @param WampRequest $request
-     * @return void
-     */
-    public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
-    {
-        // $message = 'SERVER: ' . $connection->resourceId . " has joined " . $topic->getId();
-        // $topic->broadcast(['msg' => $message]);
-    }
-
-    /**
-     * This will receive any UnSubscription requests for this topic.
-     *
-     * @param ConnectionInterface $connection
-     * @param Topic $topic
-     * @param WampRequest $request
-     * @return void
-     */
-    public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
-    {
-        //this will broadcast the message to ALL subscribers of this topic.
-        // $topic->broadcast(['msg' => $connection->resourceId . " has left " . $topic->getId()]);
-    }
-
-
-    /**
      * This will receive any Publish requests for this topic.
      *
      * @param ConnectionInterface $connection
@@ -104,32 +77,84 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
             isset($clientPayload->wsConversationRoute) &&
             isset($clientPayload->displayName) &&
             isset($clientPayload->message) &&
-            isset($clientPayload->conversationId)
+            isset($clientPayload->conversationId) && 
+            isset($clientPayload->payloadType)
         )
         {
-            $userSessionId = $connection->WAMP->sessionId;
-            $exclude = [$userSessionId];
-            
-            $user = $this->clientManipulator->getClient($connection);
+            if($clientPayload->payloadType == 'writing')
+            {
+                if(!empty($clientPayload->message))
+                {
+                    $this->_usersWhoWriting[$clientPayload->username] = array(
+                        'displayName' => $clientPayload->displayName,
+                        'message' => 'is writing...'
+                    );
+                }
+                else 
+                {
+                    unset($this->_usersWhoWriting[$clientPayload->username]);
+                }
 
-            $message = new \App\Entity\Message();
-            $message->setConversation($this->_conversation);
-            $message->setContent($clientPayload->message);
-            $message->setCreatedBy($user);
-            $message->setDeleted(false);
+                $clientPayload->message = $this->_usersWhoWriting;
+            }
+            else 
+            {
+                $userSessionId = $connection->WAMP->sessionId;
+                $exclude = [$userSessionId];
+                
+                $user = $this->clientManipulator->getClient($connection);
 
-            $this->_em->merge($message);
-            $this->_em->flush();
+                $message = new \App\Entity\Message();
+                $message->setConversation($this->_conversation);
+                $message->setContent($clientPayload->message);
+                $message->setCreatedBy($user);
+                $message->setDeleted(false);
 
-            //  * Send a message to all the connections in this topic
-            //  * @param string|array $msg Payload to publish
-            //  * @param array $exclude A list of session IDs the message should be excluded from (blacklist)
-            //  * @param array $eligible A list of session Ids the message should be send to (whitelist)
-            //  * @return Topic The same Topic object to chain
-            //     public function broadcast($msg, array $exclude = array(), array $eligible = array());
-            $topic->broadcast($event, $exclude);
+                $this->_em->merge($message);
+                $this->_em->flush();
+            }
+
+            $topic->broadcast(json_encode($clientPayload), $exclude);
         }
         
+    }
+
+    /**
+     * This will receive any Subscription requests for this topic.
+     *
+     * @param ConnectionInterface $connection
+     * @param Topic $topic
+     * @param WampRequest $request
+     * @return void
+     */
+    public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
+    {
+        $clientPayload = array(
+            'payloadType' => 'writing',
+            'message' => $this->_usersWhoWriting
+        );
+
+        $topic->broadcast(json_encode($clientPayload), [], [$connection->WAMP->sessionId]);
+    }
+
+    /**
+     * This will receive any UnSubscription requests for this topic.
+     *
+     * @param ConnectionInterface $connection
+     * @param Topic $topic
+     * @param WampRequest $request
+     * @return void
+     */
+    public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
+    {
+        $user = $this->clientManipulator->getClient($connection);
+        unset($this->_usersWhoWriting[$user->getUsername()]);
+
+        $clientPayload = array(
+            'payloadType' => 'writing',
+            'message' => $this->_usersWhoWriting
+        );
+        $topic->broadcast(json_encode($clientPayload));
     }
 
     /**
