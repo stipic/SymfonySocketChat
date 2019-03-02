@@ -46,6 +46,9 @@ webSocket.on("socket/connect", function(session) {
         
         Chat.sendMessage(msg);
         document.getElementById("form-message").value = "";
+
+        session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
+
     }, false);
 
     document.getElementById("form-message").addEventListener("input", function(){
