@@ -47,7 +47,7 @@ webSocket.on("socket/connect", function(session) {
         Chat.sendMessage(msg);
         document.getElementById("form-message").value = "";
 
-        session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
+        session.publish(clientInformation.wsConversationRoute + '/notifications', '');
 
     }, false);
 
