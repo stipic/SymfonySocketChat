@@ -1,0 +1,8 @@
+oneup_flysystem:
+    adapters:
+        my_documents_adapter:
+            local:
+                directory: '%kernel.root_dir%/../public/%storage_dir%'
+    filesystems:
+        document:
+            adapter: my_documents_adapter

@@ -69,6 +69,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
+        exit;
         $clientPayload = json_decode($event);
         if(
             isset($clientPayload->username) &&

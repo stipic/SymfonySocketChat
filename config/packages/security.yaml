@@ -34,4 +34,5 @@ security:
     access_control:
         - { path: ^/$, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_SUPERADMIN }
+        - { path: ^/_uploader, roles: ROLE_USER }
         - { path: ^(login|register)$, roles: IS_AUTHENTICATED_ANONYMOUSLY }

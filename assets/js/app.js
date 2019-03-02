@@ -25,7 +25,7 @@ webSocket.on("socket/connect", function(session) {
 
             var ul = document.getElementById("chat-list");
             var li = document.createElement("li");
-            li.appendChild(document.createTextNode(from + ': ' + message));
+            li.innerHTML = from + ': ' + message;
             ul.appendChild(li);
         },
         sendMessage: function(text)

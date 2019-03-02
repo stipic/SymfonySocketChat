@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     locale: 'en'
+    storage_dir: 'storage'
 
 services:
     # default configuration for services in *this* file
@@ -61,3 +62,15 @@ services:
         arguments: ['@doctrine.dbal.default_connection']
         tags:
             - { name: gos_web_socket.periodic }
+    
+    app_upload_listener:
+        class: App\EventListener\ConversationUploadListener
+        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag", "@gos_web_socket.wamp.pusher"]
+        tags:
+            - { name: kernel.event_listener, event: oneup_uploader.post_upload, method: afterUpload }
+            - { name: kernel.event_listener, event: oneup_uploader.pre_upload, method: beforeUpload }
+
+    app_upload_namer:
+        public: true
+        class: App\EventListener\UploadNamer
+        # arguments: ["@security.token_storage"]

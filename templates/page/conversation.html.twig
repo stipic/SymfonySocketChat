@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/3.7.0/fineuploader.min.css" rel="stylesheet">
     {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
@@ -10,7 +11,7 @@
     <ul id="chat-list">
         {% for message in messages %}
 
-            <li>{{ message.getCreatedBy().getDisplayName() == app.user.displayName ? 'me' : message.getCreatedBy().getDisplayName() }}: {{ message.content }}</li>
+            <li>{{ message.getCreatedBy().getDisplayName() == app.user.displayName ? 'me' : message.getCreatedBy().getDisplayName() }}: {{ message.content | raw }}</li>
         
         {% endfor %}
     </ul>
@@ -22,6 +23,9 @@
         <input type="button" id="form-submit" value="Send message"/>
 
     </div>
+
+    <div id="fine-uploader"></div>
+</form>
 
 
     <div>Users in conversation:</div>
@@ -61,9 +65,24 @@
     {% endfor %}
     </div>
 
+
 {% endblock %}
 
 {% block javascripts %}
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/3.7.0/fineuploader.min.js"></script>
+    <script type="text/javascript">
+        var uploader = new qq.FineUploader({
+            element: document.getElementById('fine-uploader'),
+            request: {
+                endpoint: "{{ oneup_uploader_endpoint('gallery') }}",
+                params: {
+                    conversationId: {{ conversation.id }}
+                }
+            }
+        });
+    </script>
+    
     <script type="text/javascript">
         var clientInformation = {
             payloadType: 'text',

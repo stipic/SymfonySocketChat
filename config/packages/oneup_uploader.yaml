@@ -1,0 +1,29 @@
+oneup_uploader:
+    chunks:
+        maxage: 86400
+        storage:
+            directory: '%kernel.cache_dir%/uploader/chunks'
+
+    mappings:
+
+        gallery:
+            frontend: fineuploader
+            max_size: 100000000 # 100 MB
+            enable_progress: true       
+            enable_cancelation: true   
+            namer: app_upload_namer
+            allowed_mimetypes:
+                image/jpeg: ['jpg', 'jpeg', 'jpe']
+                image/png: ['png']
+                image/gif: ['gif']
+                # image/svg+xml: ['svg']
+                # image/webp: ['webp']
+
+                # audio/mp3: ['mp3']
+                # audio/mpeg: ['mp3']
+                # application/octet-stream: ['mp3']
+
+                # video/mp4: ['mp4', 'mpeg4', 'mpeg']
+            storage:
+                type: flysystem
+                filesystem: oneup_flysystem.document_filesystem

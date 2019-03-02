@@ -11,3 +11,8 @@ gos_web_socket:
         session_handler: app_session_db_storage
     # origins:
     #     - '%origin%'
+
+    pushers:
+        wamp:
+            host: 127.0.0.1
+            port: 5510

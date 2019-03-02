@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(name="messages")
@@ -44,6 +45,12 @@ class Message
     private $createdBy;
 
     /**
+     * @var array $files
+     * @ORM\OneToMany(targetEntity="File", mappedBy="message")
+     */
+    private $files;
+
+    /**
      * @var string $updatedBy
      *
      * @Gedmo\Blameable(on="update")
@@ -61,6 +68,11 @@ class Message
      * @ORM\Column(name="deleted", type="boolean")
      */
     private $deleted;
+
+    public function __construct()
+    {
+        $this->files = new ArrayCollection();
+    }
 
     /**
      * Get the value of id
@@ -229,6 +241,21 @@ class Message
         $this->content = $content;
 
         return $this;
+    }
+
+    /**
+     * Get the value of messages
+     */ 
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    public function addFileToMessage(\App\Entity\File $file)
+    {
+        $this->files->add($file);
+
+        return $this->files;
     }
 
     /**
