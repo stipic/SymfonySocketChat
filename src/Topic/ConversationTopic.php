@@ -7,12 +7,14 @@ use Gos\Bundle\WebSocketBundle\Topic\SecuredTopicInterface;
 use Gos\Bundle\WebSocketBundle\Server\Exception\FirewallRejectionException;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
 use Ratchet\ConnectionInterface;
+use Gos\Bundle\WebSocketBundle\Topic\PushableTopicInterface;
+
 use Ratchet\Wamp\Topic;
 use Ratchet\MessageComponentInterface;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
-class ConversationTopic implements TopicInterface, SecuredTopicInterface
+class ConversationTopic implements TopicInterface, SecuredTopicInterface, PushableTopicInterface
 {
     protected $clientManipulator;
 
@@ -31,10 +33,11 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
 
     public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
     {
-        if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
-        {
-            throw new FirewallRejectionException();
-        }
+        // dump($connection);
+        // if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
+        // {
+        //     throw new FirewallRejectionException();
+        // }
 
         $pubSubRouteChunk = explode('/', $topic->getId());
         $conversationId = isset($pubSubRouteChunk[1]) ? (int) $pubSubRouteChunk[1] : false;
@@ -54,6 +57,11 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
 
             throw new FirewallRejectionException();
         }
+    }
+
+    public function onPush(Topic $topic, $request, $payload, $provider)
+    {
+        $topic->broadcast(json_encode($payload));
     }
 
     /**
@@ -93,7 +101,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface
             $this->_em->merge($message);
             $this->_em->flush();
 
-            $topic->broadcast(json_encode($clientPayload), $exclude);  
+            $topic->broadcast(json_encode($clientPayload), $exclude);
         }
     }
 

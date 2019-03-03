@@ -41,11 +41,11 @@ services:
 
     app_conversation_socket:
         class: App\Topic\ConversationTopic
-        arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker']
+        arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker', "@gos_web_socket.zmq.pusher"]
         tags:
             - { name: gos_web_socket.topic }
 
-    app_conversation_notification_socket:
+    conversation.topic:
         class: App\Topic\ConversationNotificationTopic
         arguments: ['@gos_web_socket.websocket.client_manipulator']
         tags:
@@ -65,7 +65,7 @@ services:
     
     app_upload_listener:
         class: App\EventListener\ConversationUploadListener
-        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag", "@gos_web_socket.wamp.pusher"]
+        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag", "@gos_web_socket.zmq.pusher"]
         tags:
             - { name: kernel.event_listener, event: oneup_uploader.post_upload, method: afterUpload }
             - { name: kernel.event_listener, event: oneup_uploader.pre_upload, method: beforeUpload }
