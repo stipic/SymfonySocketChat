@@ -33,29 +33,35 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
 
     public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
     {
-        // dump($connection);
-        // if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
-        // {
-        //     throw new FirewallRejectionException();
-        // }
-
-        $pubSubRouteChunk = explode('/', $topic->getId());
-        $conversationId = isset($pubSubRouteChunk[1]) ? (int) $pubSubRouteChunk[1] : false;
-        if($conversationId === false)
+        if($connection !== null)
         {
-            // krivo sam rastavio pubsub rutu, izbaci korisnika prije nego dođe do problema
-            throw new FirewallRejectionException();
+            if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
+            {
+                throw new FirewallRejectionException();
+            }
+
+            $pubSubRouteChunk = explode('/', $topic->getId());
+            $conversationId = isset($pubSubRouteChunk[1]) ? (int) $pubSubRouteChunk[1] : false;
+            if($conversationId === false)
+            {
+                // krivo sam rastavio pubsub rutu, izbaci korisnika prije nego dođe do problema
+                throw new FirewallRejectionException();
+            }
+
+            $this->_conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
+                'id' => $conversationId
+            ));
+
+            if(!$this->_authChecker->isGranted('access', $this->_conversation))
+            {
+                // korisnik nema prava pristupa ovom razgovoru.
+
+                throw new FirewallRejectionException();
+            }
         }
-
-        $this->_conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
-             'id' => $conversationId
-        ));
-
-        if(!$this->_authChecker->isGranted('access', $this->_conversation))
+        else 
         {
-            // korisnik nema prava pristupa ovom razgovoru.
-
-            throw new FirewallRejectionException();
+            // ZMQ Pusher!
         }
     }
 
