@@ -4,6 +4,7 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DashboardController extends Controller
 {
@@ -12,13 +13,15 @@ class DashboardController extends Controller
      */
     public function dashboard()
     {      
-        // Ovo dohvaća sve od nekog usera, npr. list conversation-a, opce podatke o useru
+        // dohvati sve razgovore od usera i random odaberi jedan i redirektaj na njega.
+        
         $userConversations = $this->getUser()->getConversations()->getValues();
+        $conversation = array_rand($userConversations);
+        $url = $this->generateUrl(
+            'app_conversation',
+            ['id' => $userConversations[$conversation]->getId()]
+        );
 
-        // $this->get('craue_config')->set('register', 0);
-
-        return $this->render('page/dashboard.html.twig', [
-            'conversations' => $userConversations,
-        ]);
+        return new RedirectResponse($url);
     }
 }

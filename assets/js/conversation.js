@@ -7,26 +7,30 @@ var webSocket = WS.connect("ws://" + host + ":5510");
 
 webSocket.on("socket/connect", function(session) {
 
+    function scrollToBottom(el) { el.scrollTop = el.scrollHeight; }
+    scrollToBottom(document.getElementById('content'));
 
     var Chat = 
     {
         appendMessage: function(entityPayload, message)
         {
-            var from;
-            
-            if(entityPayload.username == clientInformation.username)
-            {
-                from = "me";
-            }
-            else
-            {
-                from = entityPayload.displayName;
-            }
+            var currentdate = new Date(); 
+            var metaData = currentdate.getDate() + '.' + currentdate.getMonth() + '.' + currentdate.getFullYear() + ' ' + currentdate.getHours() + ':' + currentdate.getMinutes() + ':' + currentdate.getSeconds() + ' - ' + entityPayload.displayName; 
+            var html = `
+            <div class="message">
+                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                <div class="text-main">
+                    <div class="text-group">
+                        <div class="text">
+                            <p>` + message + `</p>
+                        </div>
+                    </div>
+                    <span>` + metaData + `</span>
+                </div>
+            </div>`;
+            $('#message-zone').append(html);
 
-            var ul = document.getElementById("chat-list");
-            var li = document.createElement("li");
-            li.innerHTML = from + ': ' + message;
-            ul.appendChild(li);
+            scrollToBottom(document.getElementById('content'));
         },
         sendMessage: function(text)
         {
@@ -37,26 +41,26 @@ webSocket.on("socket/connect", function(session) {
         }
     };
 
-    document.getElementById("form-submit").addEventListener("click", function(){
-        var msg = document.getElementById("form-message").value;
+    $(document).on("click", "#submit-message", function(event) {
+        event.preventDefault();
+
+        var msg = $("#form-message").val();
         
         if(!msg) {
             alert("Please send something on the chat");
         }
         
         Chat.sendMessage(msg);
-        document.getElementById("form-message").value = "";
+        $("#form-message").val("");
 
         session.publish(clientInformation.wsConversationRoute + '/notifications', '');
+    });
 
-    }, false);
-
-    document.getElementById("form-message").addEventListener("input", function(){
-        
-        var msg = document.getElementById("form-message").value;
+    $(document).on("input", "#form-message", function(event) {
+        event.preventDefault();
+        var msg = $("#form-message").val();
         session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
-
-    }, false);
+    });
 
     session.subscribe(clientInformation.wsConversationRoute, function(uri, payload) 
     {
@@ -68,13 +72,12 @@ webSocket.on("socket/connect", function(session) {
     session.subscribe('online', function(uri, payload) 
     {
         var responsePayload = JSON.parse(payload);
-        console.log(responsePayload);
         
-        $('span[data-usid]').each(function(event) {
+        $('li[data-usid]').each(function(event) {
 
             var userId = $(this).attr('data-usid');
 
-            $('span[data-usid="'+userId+'"]').html('[offline]');
+            $('li[data-usid="'+userId+'"]').find('.user-details').removeClass('online');
 
             for(var key in responsePayload)
             {
@@ -82,7 +85,7 @@ webSocket.on("socket/connect", function(session) {
                 {
                     if(key == userId)
                     {
-                        $('span[data-usid="'+userId+'"]').html('[ONLINE]');
+                        $('li[data-usid="'+userId+'"]').find('.user-details').addClass('online');
                     }
                 }
             }
@@ -92,7 +95,24 @@ webSocket.on("socket/connect", function(session) {
     session.subscribe(clientInformation.wsConversationRoute + '/notifications', function(uri, payload) 
     {
         var responsePayload = JSON.parse(payload);
-        $('#writing').html('');
+
+        var html = `
+        <div class="message" data-writing="` + responsePayload.username + `">
+            <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+            <div class="text-main">
+                <div class="text-group">
+                    <div class="text typing">
+                        <div class="wave">
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                            <span class="dot"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+
+        $('[data-writing="' + responsePayload.username + '"]').remove();
         for(var key in responsePayload) 
         {
             if(responsePayload.hasOwnProperty(key)) 
@@ -102,7 +122,8 @@ webSocket.on("socket/connect", function(session) {
 
                 var message = who + ' ' + doWhat;
 
-                $('#writing').append(document.createTextNode(message));
+                $('#message-zone').append(html);
+                scrollToBottom(document.getElementById('content'));
             }
         }   
     });

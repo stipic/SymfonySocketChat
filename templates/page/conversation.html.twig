@@ -7,69 +7,171 @@
 
 {% block body %}
     
-    <div><a href="/">Back to conversations</a></div>
-    <ul id="chat-list">
-        {% for message in messages %}
+    <main>
+        <div class="layout">
+            <div class="navigation">
+                <div class="container">
+                    <div class="inside">
+                        <div class="nav nav-tab menu">
+                            <button class="btn">
+                                <img class="avatar-xl" src="/avatar.jpg" alt="avatar">
+                            </button>
+                            <a href="#" data-toggle="tab" class="f-grow1 show active"><i class="material-icons active">chat_bubble_outline</i></a>
+                            <a href="#" data-toggle="tab"><i class="material-icons">settings</i></a>
+                            <a href="/logout" class="btn power"><i class="material-icons">power_settings_new</i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar" id="sidebar">
+                <div class="container">
+                    <div class="col-md-12">
+                        <div class="tab-content">
+                            
+                            <div id="discussions" class="tab-pane fade active show">
+                                <div class="search">
+                                    <form class="form-inline position-relative">
+                                        <input type="search" class="form-control" id="conversations" placeholder="Search for conversations...">
+                                        <button type="button" class="btn btn-link loop"><i class="material-icons">search</i></button>
+                                    </form>
+                                </div>		
+                                <div class="discussions">
+                                    <h1>Channels</h1>
+                                    <ul>
+                                        {% for conversation in conversations %}
 
-            <li>{{ message.getCreatedBy().getDisplayName() == app.user.displayName ? 'me' : message.getCreatedBy().getDisplayName() }}: {{ message.content | raw }}</li>
+                                            {% if conversation.isChannel == true %}
+                                                
+                                                <li>
+                                                    <a href="/conversation/{{ conversation.id }}">
+                                                        <div class="user-details">
+                                                            <i class="material-icons">lock_open</i>
+                                                        </div>
+                                                        <div class="user-nickname">
+                                                            <span>{{ conversation.channelName }}</span>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                            {% endif %}
+                                        
+                                        {% endfor %}
+                                    </ul>
+                                </div>		
+                                <div class="discussions">
+                                    <h1>Conversations</h1>
+                                    <ul>
+                                        {% for conversation in conversations %}
+
+                                            {% set userUuid = '' %}
+                                            {% if conversation.isChannel == false %}
+
+                                                {% set channelName = conversation.conversationNameForOwner %}
+                                                {% if conversation.createdBy != app.user %}
+                                                    {% set channelName = conversation.conversationNameForGuest %}
+                                                {% endif %}
+
+                                                {% for userInsideThisConversation in conversation.users.getValues() %}
+                                                    {% if userInsideThisConversation != app.user %}
+                                                        {% set userUuid = userInsideThisConversation.id %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                
+                                                <li data-usid="{{ userUuid }}">
+                                                    <a href="/conversation/{{ conversation.id }}">
+                                                        <div class="user-details">
+                                                            <i class="material-icons">account_circle</i>
+                                                        </div>
+                                                        <div class="user-nickname">
+                                                            <span>{{ channelName }}</span>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                            {% endif %}
+                                        
+                                        {% endfor %}
         
-        {% endfor %}
-    </ul>
-
-    <div id="writing"></div>
-
-    <div>
-        <textarea id="form-message" placeholder="Your public message here"></textarea>
-        <input type="button" id="form-submit" value="Send message"/>
-
-    </div>
-
-    <div id="fine-uploader"></div>
-</form>
-
-
-    <div>Users in conversation:</div>
-    <ul>
-        {% for user in conversation.getUsers() %}
-            <li>{{ user.username }}</li>
-        {% endfor %}
-    </ul>
-
-    <div>
-    {% for conversation in conversations %}
-
-        {% set userUuid = '' %}
-        {% if conversation.isChannel == false %}
-
-            {% set channelName = conversation.conversationNameForOwner %}
-            {% if conversation.createdBy != app.user %}
-                {% set channelName = conversation.conversationNameForGuest %}
-            {% endif %}
-
-            {% for userInsideThisConversation in conversation.users.getValues() %}
-                {% if userInsideThisConversation != app.user %}
-                    {% set userUuid = '<span data-usid=' ~ userInsideThisConversation.id ~ '>[offline]</span>' %}
-                {% endif %}
-            {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
+            <div class="main">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="babble tab-pane fade active show" id="list-chat" role="tabpanel" aria-labelledby="list-chat-list">
+                        <div class="chat" id="chat1">
+                            <div class="top">
+                                <div class="container">
+                                    <div class="col-md-12">
+                                        <div class="inside">
+                                            <a href="#">
+                                                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                                            </a>
+                                            <div class="status">
+                                                <i class="material-icons online">fiber_manual_record</i>
+                                            </div>
+                                            <div class="data">
+                                                <h5><a href="#">Keith Morris</a></h5>
+                                                <span>Active now</span>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content" id="content">
+                                <div class="container">
+                                    <div class="col-md-12">
 
-        {% else %}
+                                        {% for message in messages %}
 
-            {% set channelName = conversation.channelName %}
+                                            <div class="message">
+                                                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                                                <div class="text-main">
+                                                    <div class="text-group">
+                                                        <div class="text">
+                                                            <p>{{ message.content | raw }}</p>
+                                                        </div>
+                                                    </div>
+                                                    <span>{{ message.createdAt|date('d.m.Y - H:i:s')}} by {{ message.createdBy.displayName }}</span>
+                                                </div>
+                                            </div>
+                                        
+                                        {% endfor %}
+                                        
+                                        <div id="message-zone"></div>
 
-        {% endif %}
-
-
-        <li>{{ userUuid | raw }}<a href="/conversation/{{ conversation.id }}">{{ channelName }}</a>
-    
-    {% endfor %}
-    </div>
-
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div class="col-md-12">
+                                    <div class="bottom">
+                                        <form class="position-relative w-100">
+                                            <textarea class="form-control" id="form-message" placeholder="Start typing for reply..." rows="1"></textarea>
+                                            <button class="btn emoticons"><i class="material-icons">insert_emoticon</i></button>
+                                            <button type="submit" class="btn send" id="submit-message"><i class="material-icons">send</i></button>
+                                        </form>
+                                        <label>
+                                            <span id="fine-uploader" class="btn attach d-sm-block d-none"><i class="material-icons">attach_file</i></span>
+                                        </label> 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </main>
 
 {% endblock %}
-
 {% block javascripts %}
-    
+
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/3.7.0/fineuploader.min.js"></script>
     <script type="text/javascript">
         var uploader = new qq.FineUploader({
@@ -81,9 +183,6 @@
                 }
             }
         });
-    </script>
-    
-    <script type="text/javascript">
         var clientInformation = {
             payloadType: 'text',
             username: '{{ app.user.username }}',
@@ -96,3 +195,7 @@
     <script type="text/javascript" src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
     {{ encore_entry_script_tags('conversation') }}
 {% endblock %}
+
+
+
+
