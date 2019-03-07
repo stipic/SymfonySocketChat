@@ -38,17 +38,22 @@
                                 <div class="discussions">
                                     <h1>Channels</h1>
                                     <ul>
-                                        {% for conversation in conversations %}
+                                        {% for singleConversation in conversations %}
 
-                                            {% if conversation.isChannel == true %}
+                                            {% if singleConversation.isChannel == true %}
+
+                                                {% set isActive = '' %}
+                                                {% if singleConversation.id == conversation.id %}
+                                                    {% set isActive = 'active' %}
+                                                {% endif %}
                                                 
-                                                <li>
-                                                    <a href="/conversation/{{ conversation.id }}">
+                                                <li class="{{ isActive }}">
+                                                    <a href="/conversation/{{ singleConversation.id }}">
                                                         <div class="user-details">
                                                             <i class="material-icons">lock_open</i>
                                                         </div>
                                                         <div class="user-nickname">
-                                                            <span>{{ conversation.channelName }}</span>
+                                                            <span>{{ singleConversation.channelName }}</span>
                                                         </div>
                                                     </a>
                                                 </li>
@@ -61,24 +66,29 @@
                                 <div class="discussions">
                                     <h1>Conversations</h1>
                                     <ul>
-                                        {% for conversation in conversations %}
+                                        {% for singleConversation in conversations %}
 
                                             {% set userUuid = '' %}
-                                            {% if conversation.isChannel == false %}
+                                            {% if singleConversation.isChannel == false %}
 
-                                                {% set channelName = conversation.conversationNameForOwner %}
-                                                {% if conversation.createdBy != app.user %}
-                                                    {% set channelName = conversation.conversationNameForGuest %}
+                                                {% set channelName = singleConversation.conversationNameForOwner %}
+                                                {% if singleConversation.createdBy != app.user %}
+                                                    {% set channelName = singleConversation.conversationNameForGuest %}
                                                 {% endif %}
 
-                                                {% for userInsideThisConversation in conversation.users.getValues() %}
+                                                {% for userInsideThisConversation in singleConversation.users.getValues() %}
                                                     {% if userInsideThisConversation != app.user %}
                                                         {% set userUuid = userInsideThisConversation.id %}
                                                     {% endif %}
                                                 {% endfor %}
+
+                                                {% set isActive = '' %}
+                                                {% if singleConversation.id == conversation.id %}
+                                                    {% set isActive = 'active' %}
+                                                {% endif %}
                                                 
-                                                <li data-usid="{{ userUuid }}">
-                                                    <a href="/conversation/{{ conversation.id }}">
+                                                <li data-usid="{{ userUuid }}" class="{{ isActive }}">
+                                                    <a href="/conversation/{{ singleConversation.id }}">
                                                         <div class="user-details">
                                                             <i class="material-icons">account_circle</i>
                                                         </div>
