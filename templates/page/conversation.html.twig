@@ -2,7 +2,7 @@
 
 {% block stylesheets %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/3.7.0/fineuploader.min.css" rel="stylesheet">
-    {{ encore_entry_link_tags('app') }}
+    {{ encore_entry_link_tags('conversation') }}
 {% endblock %}
 
 {% block body %}
@@ -94,5 +94,5 @@
     </script>
     <script type="text/javascript" src="{{ asset('bundles/goswebsocket/js/vendor/autobahn.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/goswebsocket/js/gos_web_socket_client.js') }}"></script>
-    {{ encore_entry_script_tags('app') }}
+    {{ encore_entry_script_tags('conversation') }}
 {% endblock %}

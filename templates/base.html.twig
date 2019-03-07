@@ -2,16 +2,20 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>{% block title %}Chat{% endblock %}</title>
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
     </head>
-    <body>
+    <body class="{{ bodyClass|default('start') }}">
+
         {% block body %}{% endblock %}
 
-        {% if app.user.username is defined %}
-            <div><a href="/logout">Logout {{ app.user.username }}</a></div>
-        {% endif %}
-
-        {% block javascripts %}{% endblock %}
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
     </body>
 </html>

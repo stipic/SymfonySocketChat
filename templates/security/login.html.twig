@@ -1,28 +1,63 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    {% if error %}
-        <div class="alert alert-danger">
-            {{ error.messageKey|trans(error.messageData, 'security') }}
-        </div>
-    {% endif %}
+{% block title %}Login{% endblock %}
 
-    <form action="{{ path('security_login') }}" method="post">
-        <div>
-            <div class="form-group">
-                <label class="form-control-label required" for="username">Username</label>
-                <input type="text" id="username" name="_username" required="required" class="form-control"
-                       value="{{ last_username }}">
+{% block body %}
+    {{ parent() }}
+
+    <main>
+        <div class="layout">
+            <div class="main order-md-1">
+                <div class="start">
+                    <div class="container">
+                        <div class="col-md-12">
+                            <div class="content">
+                                <h1>Sign in</h1>
+
+                                {% if error %}
+                                    <div class="alert alert-danger">
+                                        {{ error.messageKey|trans(error.messageData, 'security') }}
+                                    </div>
+                                {% endif %}
+
+                                <form action="{{ path('security_login') }}" method="post">
+
+                                    <div class="form-group">
+                                        <input type="text" value="{{ last_username }}" id="inputEmail" name="_username" class="form-control" placeholder="Email Address" required="">
+                                        <button class="btn icon"><i class="material-icons">mail_outline</i></button>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="password" name="_password" id="inputPassword" class="form-control" placeholder="Password" required="">
+                                        <button class="btn icon"><i class="material-icons">lock_outline</i></button>
+                                    </div>
+
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                                    <input type="hidden" name="_target_path" value="{{ app.request.get('redirect_to') }}">
+
+                                    <button type="submit" class="btn button">Sign In</button>
+
+                                    <div class="callout">
+                                        <span>Don't have account? <a href="{{ path('security_register') }}">Create Account</a></span>
+                                    </div>
+                                        
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="form-control-label required" for="password">Password</label>
-                <input type="password" id="password" name="_password" required="required" class="form-control">
+            <div class="aside order-md-2">
+                <div class="container">
+                    <div class="col-md-12">
+                        <div class="preference">
+                            <h2>Hello, Friend!</h2>
+                            <p>Enter your personal details and start your journey with Chat today.</p>
+                            <a href="{{ path('security_register') }}" class="btn button">Sign Up</a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <button type="submit" id="Login" name="Login" class="btn-secondary btn">Login</button>
-            </div>
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-            <input type="hidden" name="_target_path" value="{{ app.request.get('redirect_to') }}">
         </div>
-    </form>
+    </main>
+
 {% endblock %}
