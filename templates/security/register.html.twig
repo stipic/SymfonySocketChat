@@ -17,23 +17,27 @@
                                     <div class="form-parent">
                                         
                                         <div class="form-group">
-                                            {{ form_row(registrationForm.username, { attr: { class: 'form-control', id: 'inputName', placeholder: 'Username' }}) }}
+                                            {{ form_row(registrationForm.username, { attr: { class: 'form-control', id: 'inputName', placeholder: 'Username', tabindex: 1 }}) }}
                                             <button class="btn icon"><i class="material-icons">person_outline</i></button>
                                         </div>
                                         <div class="form-group">
-                                            {{ form_row(registrationForm.email, { attr: { class: 'form-control', id: 'inputEmail', placeholder: 'Email Address' }}) }}
+                                            {{ form_row(registrationForm.email, { attr: { class: 'form-control', id: 'inputEmail', placeholder: 'Email Address', tabindex: 2 }}) }}
                                             <button class="btn icon"><i class="material-icons">mail_outline</i></button>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        {{ form_row(registrationForm.plainPassword, { attr: { class: 'form-control', placeholder: 'Password', id: 'inputPassword' }}) }}
+                                        {{ form_row(registrationForm.displayName, { attr: { class: 'form-control', placeholder: 'Full name', id: 'inputDisplay', tabindex: 3 }}) }}
+                                        <button class="btn icon"><i class="material-icons">person</i></button>
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form_row(registrationForm.plainPassword, { attr: { class: 'form-control', placeholder: 'Password', id: 'inputPassword', tabindex: 4 }}) }}
                                         <button class="btn icon"><i class="material-icons">lock_outline</i></button>
                                     </div>
 
-                                    <button type="submit" class="btn button">Sign Up</button>
+                                    <button type="submit" tabindex="5" class="btn button">Register</button>
                                    
                                     <div class="callout">
-                                        <span>Already a member? <a href="{{ path('security_login') }}">Sign In</a></span>
+                                        <span>Already a member? <a href="{{ path('security_login') }}" tabindex="6">Sign In</a></span>
                                     </div>
 
                                 {{ form_end(registrationForm) }}
@@ -49,7 +53,7 @@
                         <div class="preference">
                             <h2>Welcome Back!</h2>
                             <p>To keep connected with your friends please login with your personal info.</p>
-                            <a href="{{ path('security_login') }}" class="btn button">Sign In</a>
+                            <a href="{{ path('security_login') }}" class="btn button" tabindex="7">Sign In</a>
                         </div>
                     </div>
                 </div>

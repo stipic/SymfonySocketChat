@@ -22,6 +22,9 @@ class UserFormType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => false 
             ])
+            ->add('displayName', TextType::class, [
+                'label' => false 
+            ])
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'label' => false,

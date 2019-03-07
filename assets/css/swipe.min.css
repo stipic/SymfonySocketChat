@@ -145,7 +145,8 @@ p {
 	border-radius: 6px;
 	border: none;
 	font-size: 16px;
-	color: black !important
+	background: #f5f5f5;
+	color: #bdbac2 !important;
 }
 
 .form-control:focus {
