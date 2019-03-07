@@ -59,6 +59,9 @@ class ConversationNotificationTopic implements TopicInterface, SecuredTopicInter
             unset($this->_usersWhoWriting[$user->getUsername()]);
         }
 
+        $userSessionId = $connection->WAMP->sessionId;
+        $exclude = [$userSessionId];
+
         $topic->broadcast(json_encode($this->_usersWhoWriting), $exclude);
     }
 
