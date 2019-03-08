@@ -2,24 +2,24 @@
   "entrypoints": {
     "app": {
       "js": [
-        "/build/runtime.fa8f03f5.js",
-        "/build/1.36d1913b.js",
-        "/build/0.034359b4.js",
-        "/build/app.bb2dea7d.js"
+        "/build/runtime.js",
+        "/build/vendors~app~conversation.js",
+        "/build/app~conversation.js",
+        "/build/app.js"
       ],
       "css": [
-        "/build/0.9a49b98b.css"
+        "/build/app~conversation.css"
       ]
     },
     "conversation": {
       "js": [
-        "/build/runtime.fa8f03f5.js",
-        "/build/1.36d1913b.js",
-        "/build/0.034359b4.js",
-        "/build/conversation.53e7302a.js"
+        "/build/runtime.js",
+        "/build/vendors~app~conversation.js",
+        "/build/app~conversation.js",
+        "/build/conversation.js"
       ],
       "css": [
-        "/build/0.9a49b98b.css"
+        "/build/app~conversation.css"
       ]
     }
   }

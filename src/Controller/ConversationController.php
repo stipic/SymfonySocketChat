@@ -73,13 +73,72 @@ class ConversationController extends Controller
         //@todo trebamo napraviti query koji ce nam vratiti:
         // popis svih konverzacija od nekog usera i uz to vratiti 
         // popis SVIH userId-eva koji su u tom razgovoru.
-
         $userConversations = $this->getUser()->getConversations()->getValues();
+
+        $sortedConversations = ['channels' => [], 'direct' => [], 'current' => []];
+        foreach($userConversations as $singleUserConversation)
+        {
+            $conversationRoute = $this->generateUrl('app_conversation', ['id' => $singleUserConversation->getId()]);
+            $isActive = false;
+            if($singleUserConversation === $conversation)
+            {
+                $isActive = true;
+            }
+
+            if($singleUserConversation->getIsChannel() == true)
+            {
+                $sortedConversations['channels'][] = [
+                    'id' => $singleUserConversation->getId(),
+                    'title' => $singleUserConversation->getChannelName(),
+                    'route' => $conversationRoute,
+                    'active' => $isActive,
+                    'isChannel' => $singleUserConversation->getIsChannel(),
+                    'userIdInConversation' => $this->getUser()->getId()
+                ];
+
+                if($isActive === true)
+                {
+                    $sortedConversations['current'] = end($sortedConversations['channels']);
+                }
+            }
+            else 
+            {
+                $conversationName = $singleUserConversation->getConversationNameForOwner();
+                if($singleUserConversation->getCreatedBy() != $this->getUser())
+                {
+                    $conversationName = $singleUserConversation->getConversationNameForGuest();
+                }
+
+                //@todo ovo napraviti pametnije, ali moramo proci kroz ovaj conversation i pronaci sami sebe u tom razgovoru
+                // i vratiti ID nas, za nas ce to onda biti usid u direktnim razgovorima.
+                $userIdInConversation = '';
+                foreach($singleUserConversation->getUsers()->getValues() as $userInConversation)
+                {
+                    if($userInConversation != $this->getUser())
+                    {
+                        $userIdInConversation = $userInConversation->getId();
+                    }
+                }
+                
+                $sortedConversations['direct'][] = [
+                    'id' => $singleUserConversation->getId(),
+                    'title' => $conversationName,
+                    'route' => $conversationRoute,
+                    'active' => $isActive,
+                    'isChannel' => $singleUserConversation->getIsChannel(),
+                    'userIdInConversation' => $userIdInConversation
+                ];
+
+                if($isActive === true)
+                {
+                    $sortedConversations['current'] = end($sortedConversations['direct']);
+                }
+            }
+        }
 
         return $this->render('page/conversation.html.twig', [
             'messages' => $conversationMessages,
-            'conversation' => $conversation,
-            'conversations' => $userConversations
+            'conversations' => $sortedConversations
         ]);
     }
 }

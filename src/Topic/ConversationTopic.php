@@ -93,21 +93,25 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
             isset($clientPayload->payloadType)
         )
         {
-            $userSessionId = $connection->WAMP->sessionId;
-            $exclude = [$userSessionId];
-            
-            $user = $this->clientManipulator->getClient($connection);
+            $message = trim($clientPayload->message);
+            if(empty($message) || strlen($message) > 0)
+            {
+                $userSessionId = $connection->WAMP->sessionId;
+                $exclude = [$userSessionId];
+                
+                $user = $this->clientManipulator->getClient($connection);
 
-            $message = new \App\Entity\Message();
-            $message->setConversation($this->_conversation);
-            $message->setContent($clientPayload->message);
-            $message->setCreatedBy($user);
-            $message->setDeleted(false);
+                $message = new \App\Entity\Message();
+                $message->setConversation($this->_conversation);
+                $message->setContent($message);
+                $message->setCreatedBy($user);
+                $message->setDeleted(false);
 
-            $this->_em->merge($message);
-            $this->_em->flush();
+                $this->_em->merge($message);
+                $this->_em->flush();
 
-            $topic->broadcast(json_encode($clientPayload), $exclude);
+                $topic->broadcast(json_encode($clientPayload), $exclude);
+            }
         }
     }
 

@@ -38,27 +38,9 @@
                                 <div class="discussions">
                                     <h1>Channels</h1>
                                     <ul>
-                                        {% for singleConversation in conversations %}
+                                        {% for c in conversations.channels %}
 
-                                            {% if singleConversation.isChannel == true %}
-
-                                                {% set isActive = '' %}
-                                                {% if singleConversation.id == conversation.id %}
-                                                    {% set isActive = 'active' %}
-                                                {% endif %}
-                                                
-                                                <li class="{{ isActive }}">
-                                                    <a href="/conversation/{{ singleConversation.id }}">
-                                                        <div class="user-details">
-                                                            <i class="material-icons">lock_open</i>
-                                                        </div>
-                                                        <div class="user-nickname">
-                                                            <span>{{ singleConversation.channelName }}</span>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                            {% endif %}
+                                            {% include 'inc/conversation-item.inc.html.twig' %}
                                         
                                         {% endfor %}
                                     </ul>
@@ -66,39 +48,9 @@
                                 <div class="discussions">
                                     <h1>Conversations</h1>
                                     <ul>
-                                        {% for singleConversation in conversations %}
+                                        {% for c in conversations.direct %}
 
-                                            {% set userUuid = '' %}
-                                            {% if singleConversation.isChannel == false %}
-
-                                                {% set channelName = singleConversation.conversationNameForOwner %}
-                                                {% if singleConversation.createdBy != app.user %}
-                                                    {% set channelName = singleConversation.conversationNameForGuest %}
-                                                {% endif %}
-
-                                                {% for userInsideThisConversation in singleConversation.users.getValues() %}
-                                                    {% if userInsideThisConversation != app.user %}
-                                                        {% set userUuid = userInsideThisConversation.id %}
-                                                    {% endif %}
-                                                {% endfor %}
-
-                                                {% set isActive = '' %}
-                                                {% if singleConversation.id == conversation.id %}
-                                                    {% set isActive = 'active' %}
-                                                {% endif %}
-                                                
-                                                <li data-usid="{{ userUuid }}" class="{{ isActive }}">
-                                                    <a href="/conversation/{{ singleConversation.id }}">
-                                                        <div class="user-details">
-                                                            <i class="material-icons">account_circle</i>
-                                                        </div>
-                                                        <div class="user-nickname">
-                                                            <span>{{ channelName }}</span>
-                                                        </div>
-                                                    </a>
-                                                </li>
-
-                                            {% endif %}
+                                             {% include 'inc/conversation-item.inc.html.twig' %}
                                         
                                         {% endfor %}
         
@@ -125,7 +77,7 @@
                                                 <i class="material-icons online">fiber_manual_record</i>
                                             </div>
                                             <div class="data">
-                                                <h5><a href="#">Keith Morris</a></h5>
+                                                <h5><a href="#">{{ conversations.current.title }}</a></h5>
                                                 <span>Active now</span>
                                             </div>
                                             
@@ -139,17 +91,7 @@
 
                                         {% for message in messages %}
 
-                                            <div class="message">
-                                                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-                                                <div class="text-main">
-                                                    <div class="text-group">
-                                                        <div class="text">
-                                                            <p>{{ message.content | raw }}</p>
-                                                        </div>
-                                                    </div>
-                                                    <span>{{ message.createdAt|date('d.m.Y - H:i:s')}} by {{ message.createdBy.displayName }}</span>
-                                                </div>
-                                            </div>
+                                            {% include 'inc/message-item.inc.html.twig' %}
                                         
                                         {% endfor %}
                                         
@@ -189,15 +131,15 @@
             request: {
                 endpoint: "{{ oneup_uploader_endpoint('gallery') }}",
                 params: {
-                    conversationId: {{ conversation.id }}
+                    conversationId: {{ conversations.current.id }}
                 }
             }
         });
         var clientInformation = {
             payloadType: 'text',
             username: '{{ app.user.username }}',
-            wsConversationRoute: 'conversation/{{ conversation.id }}',
-            conversationId: {{ conversation.id }},
+            wsConversationRoute: 'conversation/{{ conversations.current.id }}',
+            conversationId: {{ conversations.current.id }},
             displayName: '{{ app.user.displayName }}'
         };
     </script>

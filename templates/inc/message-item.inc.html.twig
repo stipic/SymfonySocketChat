@@ -1,0 +1,11 @@
+<div class="message">
+    <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+    <div class="text-main">
+        <div class="text-group">
+            <div class="text">
+                <p>{{ message.content | raw }}</p>
+            </div>
+        </div>
+        <span>{{ message.createdAt|date('d.m.Y - H:i:s')}} by {{ message.createdBy.displayName }}</span>
+    </div>
+</div>

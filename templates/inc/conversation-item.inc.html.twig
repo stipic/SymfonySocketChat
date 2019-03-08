@@ -1,0 +1,14 @@
+<li class="{{ c.active ? 'active' : '' }}" data-usid="{{ c.userIdInConversation }}">
+    <a href="{{ c.route }}">
+        <div class="user-details">
+            {% if c.isChannel == true %}
+                <i class="material-icons">lock_open</i>
+            {% else %}
+                <i class="material-icons">account_circle</i>
+            {% endif %}
+        </div>
+        <div class="user-nickname">
+            <span>{{ c.title }}</span>
+        </div>
+    </a>
+</li>
