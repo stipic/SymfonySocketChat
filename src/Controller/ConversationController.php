@@ -93,7 +93,8 @@ class ConversationController extends Controller
                     'route' => $conversationRoute,
                     'active' => $isActive,
                     'isChannel' => $singleUserConversation->getIsChannel(),
-                    'userIdInConversation' => $this->getUser()->getId()
+                    'userIdInConversation' => $this->getUser()->getId(),
+                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic()
                 ];
 
                 if($isActive === true)
@@ -126,7 +127,8 @@ class ConversationController extends Controller
                     'route' => $conversationRoute,
                     'active' => $isActive,
                     'isChannel' => $singleUserConversation->getIsChannel(),
-                    'userIdInConversation' => $userIdInConversation
+                    'userIdInConversation' => $userIdInConversation,
+                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic()
                 ];
 
                 if($isActive === true)

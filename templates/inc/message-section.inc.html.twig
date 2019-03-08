@@ -1,0 +1,56 @@
+<div class="main">
+    <div class="tab-content" id="nav-tabContent">
+        <div class="babble tab-pane fade active show" id="list-chat" role="tabpanel" aria-labelledby="list-chat-list">
+            <div class="chat" id="chat1">
+                <div class="top">
+                    <div class="container">
+                        <div class="col-md-12">
+                            <div class="inside">
+                                <a href="#">
+                                    <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                                </a>
+                                <div class="status">
+                                    <i class="material-icons online">fiber_manual_record</i>
+                                </div>
+                                <div class="data">
+                                    <h5><a href="#">{{ conversations.current.title }}</a></h5>
+                                    <span>Active now</span>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content" id="content">
+                    <div class="container">
+                        <div class="col-md-12">
+
+                            {% for message in messages %}
+
+                                {% include 'inc/message-item.inc.html.twig' %}
+                            
+                            {% endfor %}
+                            
+                            <div id="message-zone"></div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="col-md-12">
+                        <div class="bottom">
+                            <form class="position-relative w-100">
+                                <textarea class="form-control" id="form-message" placeholder="Start typing for reply..." rows="1"></textarea>
+                                <button class="btn emoticons"><i class="material-icons">insert_emoticon</i></button>
+                                <button type="submit" class="btn send" id="submit-message"><i class="material-icons">send</i></button>
+                            </form>
+                            <label>
+                                <span id="fine-uploader" class="btn attach d-sm-block d-none"><i class="material-icons">attach_file</i></span>
+                            </label> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

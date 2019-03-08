@@ -7,7 +7,11 @@
     <a href="{{ c.route }}">
         <div class="user-details">
             {% if c.isChannel == true %}
-                <i class="material-icons">lock_open</i>
+                {% if c.isChannelPublic == true %}
+                    <i class="material-icons">lock_open</i>
+                {% else %}
+                    <i class="material-icons">lock</i>
+                {% endif %}
             {% else %}
                 <i class="material-icons">account_circle</i>
             {% endif %}

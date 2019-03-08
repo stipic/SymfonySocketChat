@@ -114,7 +114,7 @@ class Conversation
     private $isChannel;
 
     /**
-     * @ORM\Column(name="is_channel_public", type="boolean", nullable=true)
+     * @ORM\Column(name="is_channel_public", type="boolean", options={"default": 0})
      */
     private $isChannelPublic;
 
