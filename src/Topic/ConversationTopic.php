@@ -94,7 +94,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
         )
         {
             $message = trim($clientPayload->message);
-            if(empty($message) || strlen($message) > 0)
+            if(!empty($message) && strlen($message) > 0)
             {
                 $userSessionId = $connection->WAMP->sessionId;
                 $exclude = [$userSessionId];
