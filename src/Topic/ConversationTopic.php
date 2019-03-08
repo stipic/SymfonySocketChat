@@ -93,7 +93,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
             isset($clientPayload->payloadType)
         )
         {
-            $message = trim($clientPayload->message);
+            $msg = trim($clientPayload->message);
             if(!empty($message) && strlen($message) > 0)
             {
                 $userSessionId = $connection->WAMP->sessionId;
@@ -103,7 +103,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
 
                 $message = new \App\Entity\Message();
                 $message->setConversation($this->_conversation);
-                $message->setContent($message);
+                $message->setContent($msg);
                 $message->setCreatedBy($user);
                 $message->setDeleted(false);
 
