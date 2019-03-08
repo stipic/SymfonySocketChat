@@ -5,7 +5,7 @@
         </div>
         <div class="text-group">
             <div class="text">
-                <span>{{ message.createdBy.displayName }} in {{ message.createdAt|date('d.m.Y - H:i:s')}}</span>
+                <span><b>{{ message.createdBy.displayName }}</b> in {{ message.createdAt|date('d.m.Y - H:i:s')}}</span>
                 <p>{{ message.content | raw }}</p>
             </div>
         </div>

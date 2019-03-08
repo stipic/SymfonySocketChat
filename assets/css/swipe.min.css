@@ -1656,6 +1656,10 @@ input:checked+.slider:before {
 	margin-bottom: 10px
 }
 
+.message .text-group b {
+	color: black;
+}
+
 .message .text-group {
 	display: inline;
 }
@@ -1748,7 +1752,8 @@ input:checked+.slider:before {
 	text-align: left;
 	line-height: 1.46668;
 	color: #1d1c1d;
-    word-wrap: break-word;
+	word-wrap: break-word;
+	margin-top: 10px;
 }
 
 .main .chat .content .message .text .attachment {
