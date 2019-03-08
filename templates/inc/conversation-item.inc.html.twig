@@ -1,4 +1,9 @@
-<li class="{{ c.active ? 'active' : '' }}" data-usid="{{ c.userIdInConversation }}">
+<li 
+    class="{{ c.active ? 'active' : '' }}" 
+    {% if c.isChannel == false %}
+        data-usid="{{ c.userIdInConversation }}"
+    {% endif %}
+>
     <a href="{{ c.route }}">
         <div class="user-details">
             {% if c.isChannel == true %}
@@ -8,7 +13,8 @@
             {% endif %}
         </div>
         <div class="user-nickname">
-            <span>{{ c.title }}</span>
+            <span>{{ c.title }}</span> 
+            {# <span class="badge badge-danger">1</span> #}
         </div>
     </a>
 </li>
