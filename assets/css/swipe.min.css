@@ -2280,8 +2280,8 @@ input:checked+.slider:before {
 		margin-bottom: 50px
 	}
 	.sidebar {
-		min-width: 372px;
-		max-width: 372px;
+		min-width: 272px;
+		max-width: 272px;
 		overflow-y: scroll
 	}
 	.sidebar::-webkit-scrollbar {
