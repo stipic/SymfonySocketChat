@@ -391,7 +391,7 @@ input:checked+.slider:before {
 	min-width: 30px;
 	max-width: 30px;
 	border: 2px solid #fff;
-	border-radius: 100%
+	border-radius: 10px;
 }
 
 .avatar-md {
@@ -400,7 +400,7 @@ input:checked+.slider:before {
 	min-width: 45px;
 	max-width: 45px;
 	border: 2px solid #fff;
-	border-radius: 100%
+	border-radius: 10px;
 }
 
 .avatar-lg {
@@ -409,7 +409,7 @@ input:checked+.slider:before {
 	min-width: 50px;
 	max-width: 50px;
 	border: 3px solid #fff;
-	border-radius: 100%
+	border-radius: 10px;
 }
 
 .avatar-xl {
@@ -418,7 +418,7 @@ input:checked+.slider:before {
 	min-width: 60px;
 	max-width: 60px;
 	border: 3px solid #fff;
-	border-radius: 100%
+	border-radius: 10px;
 }
 
 .discussions ul {
