@@ -65,7 +65,7 @@ services:
     
     app_upload_listener:
         class: App\EventListener\ConversationUploadListener
-        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag", "@gos_web_socket.zmq.pusher"]
+        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag", "@app_message_handler"]
         tags:
             - { name: kernel.event_listener, event: oneup_uploader.post_upload, method: afterUpload }
             - { name: kernel.event_listener, event: oneup_uploader.pre_upload, method: beforeUpload }
@@ -74,3 +74,8 @@ services:
         public: true
         class: App\EventListener\UploadNamer
         # arguments: ["@security.token_storage"]
+
+    app_message_handler:
+        class: App\Service\MessageHandler
+        arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.zmq.pusher", "@templating"]
+        public: true

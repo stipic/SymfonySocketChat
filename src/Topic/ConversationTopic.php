@@ -67,7 +67,9 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
 
     public function onPush(Topic $topic, $request, $payload, $provider)
     {
-        $topic->broadcast(json_encode($payload));
+        $topic->broadcast([
+            'msg' => $payload
+        ]);
     }
 
     /**
@@ -83,36 +85,15 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
      */
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
-        $clientPayload = json_decode($event);
-        if(
-            isset($clientPayload->username) &&
-            isset($clientPayload->wsConversationRoute) &&
-            isset($clientPayload->displayName) &&
-            isset($clientPayload->message) &&
-            isset($clientPayload->conversationId) && 
-            isset($clientPayload->payloadType)
-        )
-        {
-            $msg = trim($clientPayload->message);
-            if(!empty($msg) && strlen($msg) > 0)
-            {
-                $userSessionId = $connection->WAMP->sessionId;
-                $exclude = [$userSessionId];
-                
-                $user = $this->clientManipulator->getClient($connection);
-
-                $message = new \App\Entity\Message();
-                $message->setConversation($this->_conversation);
-                $message->setContent($msg);
-                $message->setCreatedBy($user);
-                $message->setDeleted(false);
-
-                $this->_em->merge($message);
-                $this->_em->flush();
-
-                $topic->broadcast(json_encode($clientPayload), $exclude);
-            }
-        }
+        // u ovom kanalu nema vise publisha.
+        throw new FirewallRejectionException();
+        
+        // $userSessionId = $connection->WAMP->sessionId;
+        // $exclude = [$userSessionId];
+        
+        // $topic->broadcast([
+        //     'msg' => $event
+        // ], $exclude);
     }
 
     /**

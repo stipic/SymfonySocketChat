@@ -12,45 +12,33 @@ webSocket.on("socket/connect", function(session) {
 
     var Chat = 
     {
-        appendMessage: function(entityPayload, message)
+        appendMessage: function(messageHtml)
         {
-            var currentdate = new Date(); 
-            var metaData = currentdate.getDate() + '.' + currentdate.getMonth() + '.' + currentdate.getFullYear() + ' ' + currentdate.getHours() + ':' + currentdate.getMinutes() + ':' + currentdate.getSeconds() + ' - ' + entityPayload.displayName; 
-            var html = `
-            <div class="message">
-                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-                <div class="text-main">
-                    <div class="text-group">
-                        <div class="text">
-                            <p>` + message + `</p>
-                        </div>
-                    </div>
-                    <span>` + metaData + `</span>
-                </div>
-            </div>`;
-            $('#message-zone').append(html);
+            $('#message-zone').append(messageHtml);
 
             scrollToBottom(document.getElementById('content'));
-        },
-        sendMessage: function(text)
-        {
-            clientInformation.message = text;
-            session.publish(clientInformation.wsConversationRoute, JSON.stringify(clientInformation));
-
-            this.appendMessage(clientInformation, text);
         }
     };
 
     $(document).on("click", "#submit-message", function(event) {
         event.preventDefault();
-
+        // napravi POST request.
         var msg = $("#form-message").val();
         
-        if(!msg) {
-            alert("Please send something on the chat");
+        if(msg) 
+        {
+            $.ajax({
+                url: '/message/' + clientInformation.conversationId + '/new',
+                type: 'POST',
+                data: {
+                    'message': msg
+                },
+                complete: function(data) 
+                {
+                }
+            });
         }
         
-        Chat.sendMessage(msg);
         $("#form-message").val("");
 
         session.publish(clientInformation.wsConversationRoute + '/notifications', '');
@@ -62,11 +50,9 @@ webSocket.on("socket/connect", function(session) {
         session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
     });
 
-    session.subscribe(clientInformation.wsConversationRoute, function(uri, payload) 
+    session.subscribe(clientInformation.wsConversationRoute, function(uri, messageHtml) 
     {
-        var responsePayload = JSON.parse(payload);
-        var message = responsePayload.message;
-        Chat.appendMessage(responsePayload, message);
+        Chat.appendMessage(messageHtml.msg);
     });
 
     session.subscribe('online', function(uri, payload) 
