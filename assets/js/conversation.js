@@ -44,6 +44,14 @@ webSocket.on("socket/connect", function(session) {
         session.publish(clientInformation.wsConversationRoute + '/notifications', '');
     });
 
+    document.getElementById("form-message").focus();
+    $('#form-message').keypress(function(event){
+        if(event.keyCode === 13 ) {
+            $('#submit-message').trigger('click');
+            $("#form-message").val("");
+        }
+    });
+
     $(document).on("input", "#form-message", function(event) {
         event.preventDefault();
         var msg = $("#form-message").val();
