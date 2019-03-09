@@ -31,26 +31,39 @@
                         </div>
                     </div>
                 </div>
-                <div class="content" id="content">
-                    <div class="container">
-                        <div class="col-md-12">
-
-                            {% for message in messages %}
-
-                                {% include 'inc/message-item.inc.html.twig' %}
-                            
-                            {% endfor %}
-                            
-                            <div id="message-zone"></div>
-
+                {% if messages is empty %}
+                    <div class="content empty">
+                        <div class="container">
+                            <div class="col-md-12">
+                                <div class="no-messages">
+                                    <i class="material-icons md-48">forum</i>
+                                    <p>Seems people are shy to start the chat. Break the ice send the first message.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+                {% else %}
+                    <div class="content" id="content">
+                        <div class="container">
+                            <div class="col-md-12">
+
+                                {% for message in messages %}
+
+                                    {% include 'inc/message-item.inc.html.twig' %}
+                                
+                                {% endfor %}
+                                
+                                <div id="message-zone"></div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="container">
                     <div class="col-md-12">
                         <div class="bottom">
                             <form class="position-relative w-100">
-                                <textarea class="form-control" id="form-message" placeholder="Start typing for reply..." rows="1"></textarea>
+                                <textarea class="form-control" id="form-message" placeholder="Message {{ conversations.current.title }}" rows="1"></textarea>
                                 <button class="btn emoticons"><i class="material-icons">insert_emoticon</i></button>
                                 <button type="submit" class="btn send" id="submit-message"><i class="material-icons">send</i></button>
                             </form>
