@@ -16,7 +16,17 @@
                                     <h5><a href="#">{{ conversations.current.title }}</a></h5>
                                     <span>Active now</span>
                                 </div>
-                                
+                                <div class="dropdown">
+                                    <button class="btn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="material-icons md-30">more_vert</i></button>
+                                    <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(30px, 30px, 0px);">
+                                        <a href="#" class="dropdown-item connect"><i class="material-icons">settings</i>Settings</a>
+                                        <a href="/logout" class="dropdown-item connect"><i class="material-icons">power_settings_new</i>Logout</a>
+                                        <hr>
+                                        <button class="dropdown-item"><i class="material-icons">clear</i>Clear History</button>
+                                        <button class="dropdown-item"><i class="material-icons">block</i>Block Contact</button>
+                                        <button class="dropdown-item"><i class="material-icons">delete</i>Delete Contact</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
