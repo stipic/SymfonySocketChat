@@ -86,14 +86,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
         // u ovom kanalu nema vise publisha.
-        throw new FirewallRejectionException();
-        
-        // $userSessionId = $connection->WAMP->sessionId;
-        // $exclude = [$userSessionId];
-        
-        // $topic->broadcast([
-        //     'msg' => $event
-        // ], $exclude);
+        // throw new FirewallRejectionException();
     }
 
     /**

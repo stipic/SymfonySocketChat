@@ -58,9 +58,80 @@ webSocket.on("socket/connect", function(session) {
         session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
     });
 
-    session.subscribe(clientInformation.wsConversationRoute, function(uri, messageHtml) 
+    subscribeToTopic(clientInformation.wsConversationRoute);
+    function subscribeToTopic(topic)
     {
-        Chat.appendMessage(messageHtml.msg);
+        session.subscribe(topic, function(uri, messageHtml) 
+        {
+            Chat.appendMessage(messageHtml.msg);
+        });
+
+        session.subscribe(topic + '/notifications', function(uri, payload) 
+        {
+            var responsePayload = JSON.parse(payload);
+
+            var html = `
+            <div class="message" data-writing="` + responsePayload.username + `">
+                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                <div class="text-main">
+                    <div class="text-group">
+                        <div class="text typing">
+                            <div class="wave">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+            $('[data-writing="' + responsePayload.username + '"]').remove();
+            for(var key in responsePayload) 
+            {
+                if(responsePayload.hasOwnProperty(key)) 
+                {
+                    var who = responsePayload[key].displayName;
+                    var doWhat = responsePayload[key].message;
+
+                    var message = who + ' ' + doWhat;
+
+                    $('#message-zone').append(html);
+                    scrollToBottom(document.getElementById('content'));
+                }
+            }   
+        });
+    }
+
+    $(document).on("click", ".discussions li", function(event) {
+
+        event.preventDefault();
+    
+        $('.discussions li').removeClass('active');
+        $(this).addClass('active');
+    
+        var cid = $(this).attr('data-cid');
+        var stateObj = { foo: "bar" };
+        window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
+
+        session.unsubscribe(clientInformation.wsConversationRoute);
+        session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+        
+        clientInformation.wsConversationRoute = 'conversation/' + cid;
+        clientInformation.conversationId = cid;
+        subscribeToTopic(clientInformation.wsConversationRoute);
+        
+        $.ajax({
+            url: '/message/' + cid + '/section',
+            type: 'GET',
+            success: function(data) 
+            {
+                $("#msg-section").remove();
+                $(data).insertAfter("#sidebar");
+    
+                scrollToBottom(document.getElementById('content'));
+            }
+        });
     });
 
     session.subscribe('online', function(uri, payload) 
@@ -86,42 +157,6 @@ webSocket.on("socket/connect", function(session) {
         });
     });
 
-    session.subscribe(clientInformation.wsConversationRoute + '/notifications', function(uri, payload) 
-    {
-        var responsePayload = JSON.parse(payload);
-
-        var html = `
-        <div class="message" data-writing="` + responsePayload.username + `">
-            <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-            <div class="text-main">
-                <div class="text-group">
-                    <div class="text typing">
-                        <div class="wave">
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                            <span class="dot"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>`;
-
-        $('[data-writing="' + responsePayload.username + '"]').remove();
-        for(var key in responsePayload) 
-        {
-            if(responsePayload.hasOwnProperty(key)) 
-            {
-                var who = responsePayload[key].displayName;
-                var doWhat = responsePayload[key].message;
-
-                var message = who + ' ' + doWhat;
-
-                $('#message-zone').append(html);
-                scrollToBottom(document.getElementById('content'));
-            }
-        }   
-    });
-
     console.log("Successfully Connected!");
 })
 
@@ -129,29 +164,3 @@ webSocket.on("socket/disconnect", function(error) {
 
     console.log("Disconnected for " + error.reason + " with code " + error.code);
 })
-
-function scrollToBottom(el) { el.scrollTop = el.scrollHeight; }
-$(document).on("click", ".discussions li", function(event) {
-
-    event.preventDefault();
-
-    $('.discussions li').removeClass('active');
-    $(this).addClass('active');
-
-    var cid = $(this).attr('data-cid');
-    var stateObj = { foo: "bar" };
-    // window.history.pushState(stateObj, "page 2", "bar.html");
-    
-    window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
-    $.ajax({
-        url: '/message/' + cid + '/section',
-        type: 'GET',
-        success: function(data) 
-        {
-            $("#msg-section").remove();
-            $(data).insertAfter("#sidebar");
-
-            scrollToBottom(document.getElementById('content'));
-        }
-    });
-});
