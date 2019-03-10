@@ -8,6 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Conversation;
 use App\Form\ConversationFormType;
+use App\Service\ConversationHandler;
 
 class ConversationController extends Controller
 {
@@ -68,75 +69,9 @@ class ConversationController extends Controller
         $this->denyAccessUnlessGranted('access', $conversation);
 
         //@todo ovo za svaku poruku radi novi SQL upit, trebalo bi kreirati repositoryMetodu koja jednim pozivom dohvaca.
+        $conversationHandler = $this->get('app_conversation_handler');
         $conversationMessages = $conversation->getMessages()->getValues();
-        
-        //@todo trebamo napraviti query koji ce nam vratiti:
-        // popis svih konverzacija od nekog usera i uz to vratiti 
-        // popis SVIH userId-eva koji su u tom razgovoru.
-        $userConversations = $this->getUser()->getConversations()->getValues();
-
-        $sortedConversations = ['channels' => [], 'direct' => [], 'current' => []];
-        foreach($userConversations as $singleUserConversation)
-        {
-            $conversationRoute = $this->generateUrl('app_conversation', ['id' => $singleUserConversation->getId()]);
-            $isActive = false;
-            if($singleUserConversation === $conversation)
-            {
-                $isActive = true;
-            }
-
-            if($singleUserConversation->getIsChannel() == true)
-            {
-                $sortedConversations['channels'][] = [
-                    'id' => $singleUserConversation->getId(),
-                    'title' => $singleUserConversation->getChannelName(),
-                    'route' => $conversationRoute,
-                    'active' => $isActive,
-                    'isChannel' => $singleUserConversation->getIsChannel(),
-                    'userIdInConversation' => $this->getUser()->getId(),
-                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic()
-                ];
-
-                if($isActive === true)
-                {
-                    $sortedConversations['current'] = end($sortedConversations['channels']);
-                }
-            }
-            else 
-            {
-                $conversationName = $singleUserConversation->getConversationNameForOwner();
-                if($singleUserConversation->getCreatedBy() != $this->getUser())
-                {
-                    $conversationName = $singleUserConversation->getConversationNameForGuest();
-                }
-
-                //@todo ovo napraviti pametnije, ali moramo proci kroz ovaj conversation i pronaci sami sebe u tom razgovoru
-                // i vratiti ID nas, za nas ce to onda biti usid u direktnim razgovorima.
-                $userIdInConversation = '';
-                foreach($singleUserConversation->getUsers()->getValues() as $userInConversation)
-                {
-                    if($userInConversation != $this->getUser())
-                    {
-                        $userIdInConversation = $userInConversation->getId();
-                    }
-                }
-                
-                $sortedConversations['direct'][] = [
-                    'id' => $singleUserConversation->getId(),
-                    'title' => $conversationName,
-                    'route' => $conversationRoute,
-                    'active' => $isActive,
-                    'isChannel' => $singleUserConversation->getIsChannel(),
-                    'userIdInConversation' => $userIdInConversation,
-                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic()
-                ];
-
-                if($isActive === true)
-                {
-                    $sortedConversations['current'] = end($sortedConversations['direct']);
-                }
-            }
-        }
+        $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
         return $this->render('page/conversation.html.twig', [
             'messages' => $conversationMessages,

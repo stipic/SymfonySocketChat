@@ -3,6 +3,8 @@
     {% if c.isChannel == false %}
         data-usid="{{ c.userIdInConversation }}"
     {% endif %}
+
+    data-cid="{{ c.id }}"
 >
     <a href="{{ c.route }}">
         <div class="user-details">

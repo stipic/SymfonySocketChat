@@ -79,3 +79,8 @@ services:
         class: App\Service\MessageHandler
         arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.zmq.pusher", "@templating"]
         public: true
+
+    app_conversation_handler:
+        class: App\Service\ConversationHandler
+        arguments: ["@router"]
+        public: true

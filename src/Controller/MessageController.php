@@ -9,11 +9,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Message;
 use App\Entity\Conversation;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use App\Service\ConversationHandler;
 
 class MessageController extends Controller
 {
     /**
-     * @Route("/message/{id}/new", name="app_new_message")
+     * @Route("/message/{id}/new", name="app_new_message", condition="request.isXmlHttpRequest()")
      * @Method({"POST"})
      */
     public function newMessage(Conversation $conversation, Request $request)
@@ -26,5 +27,23 @@ class MessageController extends Controller
         ));
 
         return new Response();
+    }
+
+    /**
+     * @Route("/message/{id}/section", name="app_conversation_messages", condition="request.isXmlHttpRequest()")
+     * @Method({"GET"})
+     */
+    public function getConversationSection(Conversation $conversation, Request $request)
+    {
+        $this->denyAccessUnlessGranted('access', $conversation);
+
+        $conversationHandler = $this->get('app_conversation_handler');
+        $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
+        $conversationMessages = $conversation->getMessages()->getValues();
+
+        return $this->render('inc/message-section.inc.html.twig', array(
+            'messages' => $conversationMessages,
+            'conversations' => $sortedConversations,
+        ));
     }
 }

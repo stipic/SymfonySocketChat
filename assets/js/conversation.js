@@ -45,7 +45,7 @@ webSocket.on("socket/connect", function(session) {
     });
 
     document.getElementById("form-message").focus();
-    $('#form-message').keypress(function(event){
+    $(document).on("keypress", "#form-message", function(event){
         if(event.keyCode === 13 ) {
             $('#submit-message').trigger('click');
             $("#form-message").val("");
@@ -129,3 +129,29 @@ webSocket.on("socket/disconnect", function(error) {
 
     console.log("Disconnected for " + error.reason + " with code " + error.code);
 })
+
+function scrollToBottom(el) { el.scrollTop = el.scrollHeight; }
+$(document).on("click", ".discussions li", function(event) {
+
+    event.preventDefault();
+
+    $('.discussions li').removeClass('active');
+    $(this).addClass('active');
+
+    var cid = $(this).attr('data-cid');
+    var stateObj = { foo: "bar" };
+    // window.history.pushState(stateObj, "page 2", "bar.html");
+    
+    window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
+    $.ajax({
+        url: '/message/' + cid + '/section',
+        type: 'GET',
+        success: function(data) 
+        {
+            $("#msg-section").remove();
+            $(data).insertAfter("#sidebar");
+
+            scrollToBottom(document.getElementById('content'));
+        }
+    });
+});
