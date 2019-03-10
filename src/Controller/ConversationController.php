@@ -68,13 +68,14 @@ class ConversationController extends Controller
     {
         $this->denyAccessUnlessGranted('access', $conversation);
 
-        //@todo ovo za svaku poruku radi novi SQL upit, trebalo bi kreirati repositoryMetodu koja jednim pozivom dohvaca.
         $conversationHandler = $this->get('app_conversation_handler');
-        $conversationMessages = $conversation->getMessages()->getValues();
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
+        $messageHandler = $this->get('app_message_handler');
+        $sortedMessages = $messageHandler->getConversationMessages($conversation);
+
         return $this->render('page/conversation.html.twig', [
-            'messages' => $conversationMessages,
+            'messages' => $sortedMessages,
             'conversations' => $sortedConversations
         ]);
     }

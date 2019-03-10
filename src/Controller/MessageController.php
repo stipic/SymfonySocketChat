@@ -39,10 +39,12 @@ class MessageController extends Controller
 
         $conversationHandler = $this->get('app_conversation_handler');
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
-        $conversationMessages = $conversation->getMessages()->getValues();
+
+        $messageHandler = $this->get('app_message_handler');
+        $sortedMessages = $messageHandler->getConversationMessages($conversation);
 
         return $this->render('inc/message-section.inc.html.twig', array(
-            'messages' => $conversationMessages,
+            'messages' => $sortedMessages,
             'conversations' => $sortedConversations,
         ));
     }

@@ -17,6 +17,19 @@ webSocket.on("socket/connect", function(session) {
             $('#message-zone').append(messageHtml);
 
             scrollToBottom(document.getElementById('content'));
+        },
+        appendMessageChunk: function(messageHtml)
+        {
+            if($('#message-zone').is(':empty'))
+            {
+                $('#org-msg-zone .message:last').find('.text').append(messageHtml);
+            }
+            else 
+            {
+                $('#message-zone .message:last-child').find('.text').append(messageHtml);
+            }
+
+            scrollToBottom(document.getElementById('content'));
         }
     };
 
@@ -63,7 +76,16 @@ webSocket.on("socket/connect", function(session) {
     {
         session.subscribe(topic, function(uri, messageHtml) 
         {
-            Chat.appendMessage(messageHtml.msg);
+            if(messageHtml.msg.msgType == 'msg_block')
+            {
+                console.log('Blok');
+                Chat.appendMessage(messageHtml.msg.template);
+            }
+            else 
+            {
+                console.log('Chunk');
+                Chat.appendMessageChunk(messageHtml.msg.template);
+            }
         });
 
         session.subscribe(topic + '/notifications', function(uri, payload) 

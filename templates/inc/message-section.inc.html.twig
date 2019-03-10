@@ -45,9 +45,9 @@
                 {% else %}
                     <div class="content" id="content">
                         <div class="container">
-                            <div class="col-md-12">
+                            <div class="col-md-12" id="org-msg-zone">
 
-                                {% for message in messages %}
+                                {% for messageGroupKeyId, message in messages %}
 
                                     {% include 'inc/message-item.inc.html.twig' %}
                                 
