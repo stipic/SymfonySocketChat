@@ -48,6 +48,10 @@ class MessageHandler
                             $sortedMessagesIndex[$messageSlaveKey] = true;
                             $sortedMessages[$messageMasterKey]['messages'][] = $messageSlave;
                         }
+                        else 
+                        {
+                            break;
+                        }
                     }
                 }
             }

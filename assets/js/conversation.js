@@ -22,10 +22,12 @@ webSocket.on("socket/connect", function(session) {
         {
             if($('#message-zone').is(':empty'))
             {
+                console.log('CHUNK #1');
                 $('#org-msg-zone .message:last').find('.text').append(messageHtml);
             }
             else 
             {
+                console.log('CHUNK #2');
                 $('#message-zone .message:last-child').find('.text').append(messageHtml);
             }
 
@@ -88,41 +90,38 @@ webSocket.on("socket/connect", function(session) {
             }
         });
 
-        session.subscribe(topic + '/notifications', function(uri, payload) 
-        {
-            var responsePayload = JSON.parse(payload);
+        // session.subscribe(topic + '/notifications', function(uri, payload) 
+        // {
+        //     var responsePayload = JSON.parse(payload);
+        //     var html = `
+        //     <div class="message" data-writing="` + clientInformation.username + `">
+        //         <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+        //         <div class="text-main">
+        //             <div class="text-group">
+        //                 <div class="text typing">
+        //                     <div class="wave">
+        //                         <span class="dot"></span>
+        //                         <span class="dot"></span>
+        //                         <span class="dot"></span>
+        //                     </div>
+        //                 </div>
+        //             </div>
+        //         </div>
+        //     </div>`;
 
-            var html = `
-            <div class="message" data-writing="` + responsePayload.username + `">
-                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-                <div class="text-main">
-                    <div class="text-group">
-                        <div class="text typing">
-                            <div class="wave">
-                                <span class="dot"></span>
-                                <span class="dot"></span>
-                                <span class="dot"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+        //     $('[data-writing="' + clientInformation.username + '"]').remove();
+        //     for(var key in responsePayload) 
+        //     {
+        //         if(responsePayload.hasOwnProperty(key)) 
+        //         {
+        //             var who = responsePayload[key].username;
+        //             var doWhat = responsePayload[key].message;
 
-            $('[data-writing="' + responsePayload.username + '"]').remove();
-            for(var key in responsePayload) 
-            {
-                if(responsePayload.hasOwnProperty(key)) 
-                {
-                    var who = responsePayload[key].displayName;
-                    var doWhat = responsePayload[key].message;
-
-                    var message = who + ' ' + doWhat;
-
-                    $('#message-zone').append(html);
-                    scrollToBottom(document.getElementById('content'));
-                }
-            }   
-        });
+        //             $('#message-zone').append(html);
+        //             scrollToBottom(document.getElementById('content'));
+        //         }
+        //     }   
+        // });
     }
 
     $(document).on("click", ".discussions li", function(event) {

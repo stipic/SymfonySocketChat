@@ -50,7 +50,7 @@ class ConversationNotificationTopic implements TopicInterface, SecuredTopicInter
         if(!empty($event))
         {
             $this->_usersWhoWriting[$user->getUsername()] = array(
-                'displayName' => $user->getUsername(), //@todo
+                'username' => $user->getUsername(), //@todo
                 'message' => 'is writing...'
             );
         }
