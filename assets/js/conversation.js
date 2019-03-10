@@ -136,7 +136,7 @@ webSocket.on("socket/connect", function(session) {
         window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
 
         session.unsubscribe(clientInformation.wsConversationRoute);
-        session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+        // session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
         
         clientInformation.wsConversationRoute = 'conversation/' + cid;
         clientInformation.conversationId = cid;
