@@ -154,7 +154,7 @@ class MessageHandler
     {
         $diff = $messageSlave->getCreatedAt()->diff($messageMaster->getCreatedAt());
         if(
-            $messageSlave->getCreatedBy() === $messageSlave->getCreatedBy() && 
+            $messageMaster->getCreatedBy() === $messageSlave->getCreatedBy() && 
             $diff->y == 0 && $diff->m == 0 && $diff->d == 0 && $diff->h == 0 && $diff->i < 5 
         )
         {
