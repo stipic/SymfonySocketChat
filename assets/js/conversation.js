@@ -14,22 +14,14 @@ webSocket.on("socket/connect", function(session) {
     {
         appendMessage: function(messageHtml)
         {
-            $('#message-zone').append(messageHtml);
+            $('#org-msg-zone').append(messageHtml);
 
             scrollToBottom(document.getElementById('content'));
         },
         appendMessageChunk: function(messageHtml)
         {
-            if($('#message-zone').is(':empty'))
-            {
-                console.log('CHUNK #1');
-                $('#org-msg-zone .message:last').find('.text').append(messageHtml);
-            }
-            else 
-            {
-                console.log('CHUNK #2');
-                $('#message-zone .message:last-child').find('.text').append(messageHtml);
-            }
+            console.log('CHUNK #1');
+            $('#org-msg-zone .message:last').find('.text').append(messageHtml);
 
             scrollToBottom(document.getElementById('content'));
         }
@@ -54,14 +46,18 @@ webSocket.on("socket/connect", function(session) {
             });
         }
         
-        $("#form-message").val("");
+        // $("#form-message").reset();
+        $("#form-message").val('').change();
+        $("#form-message").html('');
 
-        session.publish(clientInformation.wsConversationRoute + '/notifications', '');
+        clientInformation.isWriting = false;
+        session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
     });
 
     document.getElementById("form-message").focus();
     $(document).on("keypress", "#form-message", function(event){
         if(event.keyCode === 13 ) {
+            event.preventDefault();
             $('#submit-message').trigger('click');
             $("#form-message").val("");
         }
@@ -70,7 +66,17 @@ webSocket.on("socket/connect", function(session) {
     $(document).on("input", "#form-message", function(event) {
         event.preventDefault();
         var msg = $("#form-message").val();
-        session.publish(clientInformation.wsConversationRoute + '/notifications', msg);
+
+        if(msg.length > 0 && clientInformation.isWriting == false) 
+        {
+            clientInformation.isWriting = true;
+            session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
+        }
+        else if(msg.length == 0 && clientInformation.isWriting == true) 
+        {
+            clientInformation.isWriting = false;
+            session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
+        }
     });
 
     subscribeToTopic(clientInformation.wsConversationRoute);
@@ -80,48 +86,48 @@ webSocket.on("socket/connect", function(session) {
         {
             if(messageHtml.msg.msgType == 'msg_block')
             {
-                console.log('Blok');
                 Chat.appendMessage(messageHtml.msg.template);
             }
             else 
             {
-                console.log('Chunk');
                 Chat.appendMessageChunk(messageHtml.msg.template);
             }
         });
 
-        // session.subscribe(topic + '/notifications', function(uri, payload) 
-        // {
-        //     var responsePayload = JSON.parse(payload);
-        //     var html = `
-        //     <div class="message" data-writing="` + clientInformation.username + `">
-        //         <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-        //         <div class="text-main">
-        //             <div class="text-group">
-        //                 <div class="text typing">
-        //                     <div class="wave">
-        //                         <span class="dot"></span>
-        //                         <span class="dot"></span>
-        //                         <span class="dot"></span>
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     </div>`;
+        session.subscribe(topic + '/notifications', function(uri, payload) 
+        {
+            console.log(payload);
+            var responsePayload = JSON.parse(payload);
+            var html = `
+            <div class="message" data-writing="` + clientInformation.username + `">
+                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                <div class="text-main">
+                    <div class="text-group">
+                        <div class="text typing">
+                            <div class="wave">
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                                <span class="dot"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
 
-        //     $('[data-writing="' + clientInformation.username + '"]').remove();
-        //     for(var key in responsePayload) 
-        //     {
-        //         if(responsePayload.hasOwnProperty(key)) 
-        //         {
-        //             var who = responsePayload[key].username;
-        //             var doWhat = responsePayload[key].message;
-
-        //             $('#message-zone').append(html);
-        //             scrollToBottom(document.getElementById('content'));
-        //         }
-        //     }   
-        // });
+            $('[data-writing="' + clientInformation.username + '"]').remove();
+            for(var key in responsePayload) 
+            {
+                if(
+                    responsePayload.hasOwnProperty(key) && 
+                    !$('[data-writing="' + clientInformation.username + '"]').length && 
+                    clientInformation.username != key
+                ) 
+                {
+                    $('#writing-notif-zone').append(html);
+                    scrollToBottom(document.getElementById('content'));
+                }
+            }   
+        });
     }
 
     $(document).on("click", ".discussions li", function(event) {
@@ -136,7 +142,7 @@ webSocket.on("socket/connect", function(session) {
         window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
 
         session.unsubscribe(clientInformation.wsConversationRoute);
-        // session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+        session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
         
         clientInformation.wsConversationRoute = 'conversation/' + cid;
         clientInformation.conversationId = cid;

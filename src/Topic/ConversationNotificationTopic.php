@@ -47,7 +47,8 @@ class ConversationNotificationTopic implements TopicInterface, SecuredTopicInter
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
         $user = $this->clientManipulator->getClient($connection);
-        if(!empty($event))
+        $isWriting = (bool) $event;
+        if($isWriting == true)
         {
             $this->_usersWhoWriting[$user->getUsername()] = array(
                 'username' => $user->getUsername(), //@todo
