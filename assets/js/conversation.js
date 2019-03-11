@@ -139,14 +139,6 @@ webSocket.on("socket/connect", function(session) {
     
         var cid = $(this).attr('data-cid');
         var stateObj = { foo: "bar" };
-        window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
-
-        session.unsubscribe(clientInformation.wsConversationRoute);
-        session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
-        
-        clientInformation.wsConversationRoute = 'conversation/' + cid;
-        clientInformation.conversationId = cid;
-        subscribeToTopic(clientInformation.wsConversationRoute);
         
         $.ajax({
             url: '/message/' + cid + '/section',
@@ -157,6 +149,14 @@ webSocket.on("socket/connect", function(session) {
                 $(data).insertAfter("#sidebar");
     
                 scrollToBottom(document.getElementById('content'));
+                window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
+
+                session.unsubscribe(clientInformation.wsConversationRoute);
+                session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+                
+                clientInformation.wsConversationRoute = 'conversation/' + cid;
+                clientInformation.conversationId = cid;
+                subscribeToTopic(clientInformation.wsConversationRoute);
             }
         });
     });
