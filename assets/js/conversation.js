@@ -190,4 +190,5 @@ webSocket.on("socket/connect", function(session) {
 webSocket.on("socket/disconnect", function(error) {
 
     console.log("Disconnected for " + error.reason + " with code " + error.code);
+    location.reload();
 })
