@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
@@ -12,26 +11,18 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Table(name="messages")
  * @ORM\Entity
+ * @ORM\Table(name="message_blocks")
  * @ORM\HasLifecycleCallbacks()
  */
-class Message
+class MessageBlock
 {
     /**
+     * @ORM\Id()
+     * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      */
     private $id;
-
-    /**
-     * @var string $messageBlock
-     * 
-     * @ORM\ManyToOne(targetEntity="MessageBlock", inversedBy="messages")
-     * @ORM\JoinColumn(name="messageBlock", referencedColumnName="id")
-     */
-    private $messageBlock;
 
     /**
      * @ORM\Column(name="created_at", type="datetime")
@@ -41,16 +32,19 @@ class Message
     /**
      * @var string $createdBy
      *
+     * @Gedmo\Blameable(on="create")
 	 * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="created_by", referencedColumnName="id")
      */
     private $createdBy;
 
     /**
-     * @var array $files
-     * @ORM\OneToMany(targetEntity="File", mappedBy="message")
+     * @var array $messages
+     * 
+     * @ORM\OneToMany(targetEntity="Message", mappedBy="messageBlock", cascade={"persist","remove"})
+     * @ORM\OrderBy({"createdAt" = "ASC"})
      */
-    private $files;
+    private $messages;
 
     /**
      * @var string $updatedBy
@@ -62,18 +56,19 @@ class Message
     private $updatedBy;
 
     /**
-     * @ORM\Column(type="text", name="content", options={"default": ""})
+     * @ORM\ManyToOne(targetEntity="Conversation", inversedBy="messageBlocks")
+     * @ORM\JoinColumn(name="conversation", referencedColumnName="id")
      */
-    private $content;
+    private $conversation;
 
     /**
-     * @ORM\Column(name="deleted", type="boolean")
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
-    private $deleted;
+    private $updatedAt;
 
     public function __construct()
     {
-        $this->files = new ArrayCollection();
+        $this->messages = new ArrayCollection();
     }
 
     /**
@@ -92,26 +87,6 @@ class Message
     public function setId($id)
     {
         $this->id = $id;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of messageBlock
-     */ 
-    public function getMessageBlock()
-    {
-        return $this->messageBlock;
-    }
-
-    /**
-     * Set the value of messageBlock
-     *
-     * @return  self
-     */ 
-    public function setMessageBlock($messageBlock)
-    {
-        $this->messageBlock = $messageBlock;
 
         return $this;
     }
@@ -137,28 +112,6 @@ class Message
     {
         return $this->createdAt;
     }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return Page
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-	}
 
 	/**
      * Set CreatedBy
@@ -206,58 +159,31 @@ class Message
     }
 
     /**
-     * Get the value of deleted
-     */ 
-    public function getDeleted()
-    {
-        return $this->deleted;
-    }
-
-    /**
-     * Set the value of deleted
-     *
-     * @return  self
-     */ 
-    public function setDeleted($deleted)
-    {
-        $this->deleted = $deleted;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of content
-     */ 
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /**
-     * Set the value of content
-     *
-     * @return  self
-     */ 
-    public function setContent($content)
-    {
-        $this->content = $content;
-
-        return $this;
-    }
-
-    /**
      * Get the value of messages
      */ 
-    public function getFiles()
+    public function getMessages()
     {
-        return $this->files;
+        return $this->messages;
     }
 
-    public function addFileToMessage(\App\Entity\File $file)
+    /**
+     * Get the value of conversationId
+     */ 
+    public function getConversation()
     {
-        $this->files->add($file);
+        return $this->conversation;
+    }
 
-        return $this->files;
+    /**
+     * Set the value of conversationId
+     *
+     * @return  self
+     */ 
+    public function setConversation($conversation)
+    {
+        $this->conversation = $conversation;
+
+        return $this;
     }
 
     /**
@@ -266,5 +192,25 @@ class Message
     public function prePersistSetCreatedAt()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * Get the value of updatedAt
+     */ 
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set the value of updatedAt
+     *
+     * @return  self
+     */ 
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 }

@@ -67,15 +67,15 @@ class ConversationController extends Controller
     public function conversation(Conversation $conversation, Request $request)
     {
         $this->denyAccessUnlessGranted('access', $conversation);
-
+        
         $conversationHandler = $this->get('app_conversation_handler');
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
         $messageHandler = $this->get('app_message_handler');
-        $sortedMessages = $messageHandler->getConversationMessages($conversation);
+        $messageBlocks = $messageHandler->getConversationMessages($conversation);
 
         return $this->render('page/conversation.html.twig', [
-            'messages' => $sortedMessages,
+            'messages' => $messageBlocks,
             'conversations' => $sortedConversations
         ]);
     }

@@ -93,11 +93,11 @@ class Conversation
     private $createdBy;
 
     /**
-     * @var array $messages
-     * @ORM\OneToMany(targetEntity="Message", mappedBy="conversation", cascade={"persist","remove"})
+     * @var array $messageBlocks
+     * @ORM\OneToMany(targetEntity="MessageBlock", mappedBy="conversation", cascade={"persist","remove"})
      * @ORM\OrderBy({"createdAt" = "ASC"})
      */
-    private $messages;
+    private $messageBlocks;
 
     /**
      * @var string $updatedBy
@@ -114,7 +114,7 @@ class Conversation
     private $isChannel;
 
     /**
-     * @ORM\Column(name="is_channel_public", type="boolean", options={"default": 0})
+     * @ORM\Column(name="is_channel_public", type="boolean", options={"default": 0}, nullable=true)
      */
     private $isChannelPublic;
 
@@ -130,7 +130,7 @@ class Conversation
 
     public function __construct()
     {
-        $this->messages = new ArrayCollection();
+        $this->messageBlocks = new ArrayCollection();
         $this->users = new ArrayCollection();
     }
 
@@ -304,11 +304,11 @@ class Conversation
     }
 
     /**
-     * Get the value of messages
+     * Get the value of messageBlocks
      */ 
-    public function getMessages()
+    public function getMessageBlocks()
     {
-        return $this->messages;
+        return $this->messageBlocks;
     }
 
     /**

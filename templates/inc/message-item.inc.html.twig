@@ -1,12 +1,12 @@
 <div class="message" data-mgid="{{ messageGroupKeyId }}">
     <div class="text-main">
         <div class="text-profile">
-            <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="{{ message.groupOwner.displayName }}">
+            <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="{{ messageBlock.createdBy.displayName }}">
         </div>
         <div class="text-group">
             <div class="text">
-                <span><b>{{ message.groupOwner.displayName }}</b> in {{ message.groupStartedAt|date('d.m.Y - H:i:s')}}</span>
-                {% for messageChunk in message.messages %}
+                <span><b>{{ messageBlock.createdBy.displayName }}</b> in {{ messageBlock.getCreatedAt|date('d.m.Y - H:i:s')}}</span>
+                {% for messageChunk in messageBlock.messages %}
 
                     {% include 'inc/message-chunk.inc.html.twig' %}
                 

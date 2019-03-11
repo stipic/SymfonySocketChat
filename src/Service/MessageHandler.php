@@ -2,6 +2,9 @@
 namespace App\Service;
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Entity\MessageBlock;
+use App\Entity\User;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
 class MessageHandler 
@@ -21,43 +24,8 @@ class MessageHandler
 
     public function getConversationMessages(Conversation $conversation) 
     {
-        //@todo ovo za svaku poruku radi novi SQL upit, trebalo bi kreirati repositoryMetodu koja jednim pozivom dohvaca.
-        $sortedMessagesIndex = [];
-        $sortedMessages = [];
-        
-        $conversationMessages = $conversation->getMessages()->getValues();
-
-        foreach($conversationMessages as $messageMasterKey => $messageMaster) 
-        {
-            if(!isset($sortedMessagesIndex[$messageMasterKey]))
-            {
-                $sortedMessagesIndex[$messageMasterKey] = true;
-                $sortedMessages[$messageMasterKey] = [
-                    'groupOwner' => $messageMaster->getCreatedBy(),
-                    'groupStartedAt' => $messageMaster->getCreatedAt(),
-                    'messages' => [$messageMaster]
-                ];
-
-                foreach($conversationMessages as $messageSlaveKey => $messageSlave) 
-                {
-                    if(!isset($sortedMessagesIndex[$messageSlaveKey]))
-                    {
-                        if($this->_isMessageChunk($messageMaster, $messageSlave))
-                        {
-                            // ukoliko su vlasnici poruka isti, a vremenska razlika manja od 5 minuta, mergaj to u jedan chunk
-                            $sortedMessagesIndex[$messageSlaveKey] = true;
-                            $sortedMessages[$messageMasterKey]['messages'][] = $messageSlave;
-                        }
-                        else 
-                        {
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $sortedMessages;
+        $conversationMessages = $conversation->getMessageBlocks()->getValues();
+        return $conversationMessages;
     }
 
     public function insertMessage($msg, Conversation $conversation, $params = array())
@@ -65,16 +33,11 @@ class MessageHandler
         if(!empty($msg) && strlen($msg) > 0)
         {
             $msg = trim($msg);
+            $user = $params['createdBy'];
 
             $message = new Message();
-            $message->setConversation($conversation);
             $message->setContent($msg);
-
-            if(isset($params['createdBy']))
-            {
-                $message->setCreatedBy($params['createdBy']);
-            }
-            
+            $message->setCreatedBy($user);
             $message->setDeleted(false);
 
             if(isset($params['files']))
@@ -85,15 +48,12 @@ class MessageHandler
                 }
             }
 
-            $this->_em->merge($message);
-            $this->_em->flush();
-
-            //@todo, provjeri dali je zadnja poruka chunk ili blok
-            // i ovisno o svemu vracamo ili cijeli message blok ili samo chunk koji mergamo u postojeci blok.
-
-            //ukoliko je chunk, MORAMO mu reci koji messsage-blok je owner. - UPDATE: NE, NEMORAMO, ako je chunk, UVIJEK je zadnji blok!!!
-            if($this->_isNewMessageChunk($conversation))
+            $messageBlock = $this->_isNewMessageChunk($conversation, $user);            
+            if($messageBlock instanceof MessageBlock)
             {
+                // CHUNK!
+                $messageBlock->setUpdatedAt(new \DateTime()); // Updateaj blokov updatedAt !!! VAZNO !!!
+
                 $msgTemplate = [
                     'template' => $this->_twig->render('inc/message-chunk.inc.html.twig', array(
                         'messageChunk' => $message, 
@@ -103,21 +63,32 @@ class MessageHandler
             }
             else 
             {
-                $formatedMessage = [
-                    'groupOwner' => $message->getCreatedBy(),
-                    'groupStartedAt' => $message->getCreatedAt(),
-                    'messages' => [$message]
-                ];
+                // BLOK!
+                $messageBlock = new MessageBlock();
+                $messageBlock->setConversation($conversation);
+                $messageBlock->setCreatedBy($user);
+                
+                $this->_em->persist($messageBlock);
 
                 $msgTemplate = [
                     'template' => $this->_twig->render('inc/message-item.inc.html.twig', array(
-                        'message' => $formatedMessage, 
+                        'messageBlock' => [
+                            'createdBy' => $user,
+                            'getCreatedAt' => new \DateTime(),
+                            'messages' => [$message]
+                        ], 
                         'messageGroupKeyId' => $message->getId(),
 
                     )),
                     'msgType' => 'msg_block'
                 ];
             }
+
+            $message->setMessageBlock($messageBlock);
+
+            $this->_em->persist($messageBlock);
+            $this->_em->merge($message);
+            $this->_em->flush();
 
             $this->_zmqPusher->push($msgTemplate, 'app_topic_chat', ['conversationId' => $conversation->getId()]);
 
@@ -130,39 +101,37 @@ class MessageHandler
         return false;
     }
 
-    private function _isNewMessageChunk(Conversation $conversation)
+    /**
+     * Metoda koja dohvaca zadnji MessageBlok razgovora i onda provjerava
+     * dali je user koji upravo objavljuje poruku vlasnik zadnjeg bloka, ukoliko JE
+     * provjerava dali je zadnji "updatedAt" (vrijeme kada je zadnja poruka injectana u blok) u intervalu 
+     * od 5 minuta, ukoliko i to je onda je nova poruka CHUNK i vracamo $messageBlok objekt u suprotnom vracamo false
+     */
+    private function _isNewMessageChunk(Conversation $conversation, User $user)
     {
-        $messageRepository = $this->_em->getRepository(Message::class);
-        $lastTwoMessagesInConversation = $messageRepository->findBy(
+        $messageBlockRepository = $this->_em->getRepository(MessageBlock::class);
+        $lastMessageBlockInConversation = $messageBlockRepository->findOneBy(
             array('conversation' => $conversation->getId()),
-            array('id' => 'DESC'),
-            2,
-            0
+            array('id' => 'DESC')
         );
 
-        if(isset($lastTwoMessagesInConversation[0]) && isset($lastTwoMessagesInConversation[1]))
+        if($lastMessageBlockInConversation !== null) 
         {
-            $messageSlave = $lastTwoMessagesInConversation[0]; // 0 zadnja poruka
-            $messageMaster = $lastTwoMessagesInConversation[1]; // 1 predzadnja poruka
-
-            if($this->_isMessageChunk($messageMaster, $messageSlave))
+            if($lastMessageBlockInConversation->getCreatedBy() == $user)
             {
-                return true;
+                if($lastMessageBlockInConversation->getUpdatedAt() == null)
+                {
+                    return $lastMessageBlockInConversation;
+                }
+                else 
+                {
+                    $diff = (new \DateTime())->diff($lastMessageBlockInConversation->getUpdatedAt());
+                    if($diff->y == 0 && $diff->m == 0 && $diff->d == 0 && $diff->h == 0 && $diff->i < 5)
+                    {
+                        return $lastMessageBlockInConversation;
+                    }
+                }
             }
-        }
-
-        return false;
-    }
-
-    private function _isMessageChunk(Message $messageMaster, Message $messageSlave)
-    {
-        $diff = $messageSlave->getCreatedAt()->diff($messageMaster->getCreatedAt());
-        if(
-            $messageMaster->getCreatedBy() === $messageSlave->getCreatedBy() && 
-            $diff->y == 0 && $diff->m == 0 && $diff->d == 0 && $diff->h == 0 && $diff->i < 5 
-        )
-        {
-            return true;
         }
 
         return false;
