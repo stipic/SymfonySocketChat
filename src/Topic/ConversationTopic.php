@@ -67,9 +67,46 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
 
     public function onPush(Topic $topic, $request, $payload, $provider)
     {
-        $topic->broadcast([
-            'msg' => $payload
-        ]);
+        if(isset($payload['unreadParams']))
+        {
+            $messageId = $payload['unreadParams']['msgId'];
+            $conversationId = $payload['unreadParams']['conversationId'];
+            if($this->_conversation === NULL)
+            {
+                $this->_conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
+                    'id' => $conversationId
+                ));
+            }
+
+            $message = $this->_em->getRepository(\App\Entity\Message::class)->findOneBy(array(
+                'id' => $messageId
+            ));
+            
+            if($message !== null)
+            {
+                $conversationUsers = $this->_conversation->getUsers()->getValues();
+                foreach($conversationUsers as $userInConversation) 
+                {
+                    $user = $this->clientManipulator->findByUsername($topic, $userInConversation->getUsername());
+                    if($user === false) 
+                    {
+                        // korisnik $userInConversation se trenutno ne nalazi u ovom chat-u, stoga on ide na listu.
+                        $userInConversation->addUnreadedMessage($message);
+
+                        $this->_em->persist($userInConversation);
+                        $this->_em->flush();
+
+                        // ZmqPusher sad pusha notifikaciju u njegov private kanal kako bi mu prikazali odma notifikaciju.
+                    }
+                }
+            }
+
+            unset($payload['unreadParams']);
+
+            $topic->broadcast([
+                'msg' => $payload,
+            ]);
+        }
     }
 
     /**

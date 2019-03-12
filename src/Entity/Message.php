@@ -112,7 +112,7 @@ class Message
         return $this->unreadedBy;
     }
 
-    public function addUserThatReadThisMessage(\App\Entity\User $user)
+    public function addUserOnUnreadedList(\App\Entity\User $user)
     {
         $user->addUnreadedMessage($this);
         $this->unreadedBy->add($user);
@@ -161,28 +161,6 @@ class Message
     {
         return $this->createdAt;
     }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return Page
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-	}
 
 	/**
      * Set CreatedBy

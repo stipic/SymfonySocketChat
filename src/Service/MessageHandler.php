@@ -85,8 +85,11 @@ class MessageHandler
             $message->setMessageBlock($messageBlock);
 
             $this->_em->persist($messageBlock);
-            $this->_em->merge($message);
+            $message = $this->_em->merge($message);
             $this->_em->flush();
+
+            $msgTemplate['unreadParams']['msgId'] = $message->getId();
+            $msgTemplate['unreadParams']['conversationId'] = $conversation->getId();
 
             $this->_zmqPusher->push($msgTemplate, 'app_topic_chat', ['conversationId' => $conversation->getId()]);
 
