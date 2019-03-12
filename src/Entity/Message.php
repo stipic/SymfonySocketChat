@@ -71,9 +71,17 @@ class Message
      */
     private $deleted;
 
+    /**
+     * users that didn't read this message.
+     * 
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="unreadedMessages")
+     */
+    private $unreadedBy;
+
     public function __construct()
     {
         $this->files = new ArrayCollection();
+        $this->unreadedBy = new ArrayCollection();
     }
 
     /**
@@ -94,6 +102,22 @@ class Message
         $this->id = $id;
 
         return $this;
+    }
+
+    /**
+     * Get the value of users that didnt read this message
+     */ 
+    public function getUnreadedBy()
+    {
+        return $this->unreadedBy;
+    }
+
+    public function addUserThatReadThisMessage(\App\Entity\User $user)
+    {
+        $user->addUnreadedMessage($this);
+        $this->unreadedBy->add($user);
+
+        return $this->unreadedBy;
     }
 
     /**

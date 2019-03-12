@@ -184,6 +184,11 @@ webSocket.on("socket/connect", function(session) {
         });
     });
 
+    session.subscribe('unreaded/' + clientInformation.username , function (uri, payload) {
+        var responsePayload = JSON.parse(payload);
+        console.log('unreaded: ', responsePayload);
+    });
+
     console.log("Successfully Connected!");
 })
 

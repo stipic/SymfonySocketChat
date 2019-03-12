@@ -55,6 +55,14 @@ class User implements UserInterface, \Serializable
     private $conversations;
 
     /**
+     * @var array $unreadedMessages
+     * 
+     * @ORM\ManyToMany(targetEntity="Message", inversedBy="unreadedBy")
+     * @ORM\OrderBy({"id" = "DESC"})
+     */
+    private $unreadedMessages;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
      *
      */
@@ -64,6 +72,7 @@ class User implements UserInterface, \Serializable
     {
         $this->conversations = new ArrayCollection();
         $this->groups = new ArrayCollection();
+        $this->unreadedMessages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -186,6 +195,20 @@ class User implements UserInterface, \Serializable
     public function removeConversation(\App\Entity\Conversation $conversation)
     {
         $this->conversations->removeElement($conversation);
+    }
+
+    /////////////////////////
+
+    public function addUnreadedMessage(\App\Entity\Message $message)
+    {
+        $this->unreadedMessages[] = $message;
+
+        return $this;
+    }
+
+    public function removeUnreadedMessage(\App\Entity\Message $message)
+    {
+        $this->unreadedMessages->removeElement($message);
     }
 
     public function serialize()

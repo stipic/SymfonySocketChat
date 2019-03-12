@@ -18,3 +18,11 @@ app_online_users:
     channel: 'online'
     handler:
         callback: 'online_user.topic'
+
+app_unread_messages:
+    channel: 'unreaded/{username}'
+    handler:
+        callback: 'user_unread_message.topic'
+    requirements:
+        username:
+            pattern: '[a-z]+'

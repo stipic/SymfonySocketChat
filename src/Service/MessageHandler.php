@@ -68,8 +68,6 @@ class MessageHandler
                 $messageBlock->setConversation($conversation);
                 $messageBlock->setCreatedBy($user);
                 
-                $this->_em->persist($messageBlock);
-
                 $msgTemplate = [
                     'template' => $this->_twig->render('inc/message-item.inc.html.twig', array(
                         'messageBlock' => [

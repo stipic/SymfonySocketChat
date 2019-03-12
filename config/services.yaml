@@ -84,3 +84,9 @@ services:
         class: App\Service\ConversationHandler
         arguments: ["@router"]
         public: true
+
+    app_user_unread_message_socket:
+        class: App\Topic\UserUnreadMessageTopic
+        arguments: ['@gos_web_socket.websocket.client_manipulator']
+        tags:
+            - { name: gos_web_socket.topic }
