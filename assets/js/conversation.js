@@ -139,6 +139,8 @@ webSocket.on("socket/connect", function(session) {
     
         var cid = $(this).attr('data-cid');
         var stateObj = { foo: "bar" };
+
+        session.publish('unreaded/' + clientInformation.username, '');
         
         $.ajax({
             url: '/message/' + cid + '/section',
@@ -192,15 +194,14 @@ webSocket.on("socket/connect", function(session) {
         {
             if(responsePayload.hasOwnProperty(key))
             {
+                var injectVal = '';
                 if(responsePayload[key] > 0)
                 {
-                    $("li[data-cid='" + key + "'] .user-nickname span:last").html(responsePayload[key]);
+                    injectVal = responsePayload[key];
                 }
+
+                $("li[data-cid='" + key + "'] .user-nickname span:last").html(injectVal);
                 
-                // if(key == userId)
-                // {
-                //     $('li[data-usid="'+userId+'"]').find('.user-details').addClass('online');
-                // }
             }
         }
     });
