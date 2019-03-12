@@ -82,11 +82,11 @@ services:
 
     app_conversation_handler:
         class: App\Service\ConversationHandler
-        arguments: ["@router"]
+        arguments: ["@router", "@doctrine.orm.entity_manager"]
         public: true
 
     app_user_unread_message_socket:
         class: App\Topic\UserUnreadMessageTopic
-        arguments: ['@gos_web_socket.websocket.client_manipulator']
+        arguments: ['@gos_web_socket.websocket.client_manipulator', "@doctrine.orm.entity_manager"]
         tags:
             - { name: gos_web_socket.topic }

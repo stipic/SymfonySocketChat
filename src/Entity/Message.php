@@ -120,6 +120,14 @@ class Message
         return $this->unreadedBy;
     }
 
+    public function removeUserFromUnreadedList(\App\Entity\User $user)
+    {
+        $user->removeUnreadedMessage($this);
+        $this->unreadedBy->removeElement($user);
+
+        return $this->unreadedBy;
+    }
+
     /**
      * Get the value of messageBlock
      */ 

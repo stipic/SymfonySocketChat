@@ -185,8 +185,24 @@ webSocket.on("socket/connect", function(session) {
     });
 
     session.subscribe('unreaded/' + clientInformation.username , function (uri, payload) {
+
+        console.log('unreaded: ', payload);
         var responsePayload = JSON.parse(payload);
-        console.log('unreaded: ', responsePayload);
+        for(var key in responsePayload)
+        {
+            if(responsePayload.hasOwnProperty(key))
+            {
+                if(responsePayload[key] > 0)
+                {
+                    $("li[data-cid='" + key + "'] .user-nickname span:last").html(responsePayload[key]);
+                }
+                
+                // if(key == userId)
+                // {
+                //     $('li[data-usid="'+userId+'"]').find('.user-details').addClass('online');
+                // }
+            }
+        }
     });
 
     console.log("Successfully Connected!");

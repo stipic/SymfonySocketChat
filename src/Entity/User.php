@@ -238,4 +238,14 @@ class User implements UserInterface, \Serializable
     {
         $this->createdAt = new \DateTime();
     }
+
+    /**
+     * Get $unreadedMessages
+     *
+     * @return  array
+     */ 
+    public function getUnreadedMessages()
+    {
+        return $this->unreadedMessages;
+    }
 }

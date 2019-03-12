@@ -20,7 +20,7 @@
         </div>
         <div class="user-nickname">
             <span>{{ c.title }}</span> 
-            {# <span class="badge badge-danger">1</span> #}
+            <span class="badge badge-danger">{{ c.unreadedMessages == 0 ? '' : c.unreadedMessages }}</span>
         </div>
     </a>
 </li>

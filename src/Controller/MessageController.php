@@ -43,6 +43,8 @@ class MessageController extends Controller
         $messageHandler = $this->get('app_message_handler');
         $sortedMessages = $messageHandler->getConversationMessages($conversation);
 
+        // update unreaded messages.
+
         return $this->render('inc/message-section.inc.html.twig', array(
             'messages' => $sortedMessages,
             'conversations' => $sortedConversations,

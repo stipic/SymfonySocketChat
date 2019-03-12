@@ -24,11 +24,14 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
 
     private $_conversation;
 
-    public function __construct(ClientManipulator $clientManipulator, EntityManager $em, AuthorizationChecker $authChecker)
+    private $_zmqPusher;
+
+    public function __construct(ClientManipulator $clientManipulator, EntityManager $em, AuthorizationChecker $authChecker, $pusher)
     {
         $this->clientManipulator = $clientManipulator;
         $this->_em = $em;
         $this->_authChecker = $authChecker;
+        $this->_zmqPusher = $pusher;
     }
 
     public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
@@ -97,6 +100,15 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
                         $this->_em->flush();
 
                         // ZmqPusher sad pusha notifikaciju u njegov private kanal kako bi mu prikazali odma notifikaciju.
+                        
+                        $receiverPayload = [
+                            'type' => 'unread', // vs 'read'
+                            'conversationId' => $conversationId,
+                            'messageId' => $messageId,
+                            'userId' => $userInConversation->getId()
+                        ];
+
+                        $this->_zmqPusher->push($receiverPayload, 'app_unread_messages', ['username' => $userInConversation->getUsername()]);
                     }
                 }
             }

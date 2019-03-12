@@ -8,23 +8,58 @@ use Gos\Bundle\WebSocketBundle\Topic\SecuredTopicInterface;
 use Gos\Bundle\WebSocketBundle\Topic\TopicInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
+use Gos\Bundle\WebSocketBundle\Topic\PushableTopicInterface;
+use Doctrine\ORM\EntityManager;
 
-class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface
+class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, PushableTopicInterface
 {
     protected $clientManipulator;
 
-    private $_onlineUsers = array();
+    private $_em;
 
-    public function __construct(ClientManipulator $clientManipulator)
+    public function __construct(ClientManipulator $clientManipulator, EntityManager $em)
     {
         $this->clientManipulator = $clientManipulator;
+        $this->_em = $em;
     }
 
     public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
     {
-        if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User) {
-            throw new FirewallRejectionException();
+        if($connection !== null)
+        {
+            if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User) 
+            {
+                throw new FirewallRejectionException();
+            }
         }
+        else 
+        {
+            // ZmqPusher
+        }
+
+        //@todo provjeri dali je ID usera jednak ID-u ovog topic-a
+    }
+
+    public function onPush(Topic $topic, $request, $payload, $provider)
+    {
+        $userId = $payload['userId'];
+        // $conversationId = $payload['conversationId'];
+        $user = $this->_em->getRepository(\App\Entity\User::class)->findOneBy(array(
+            'id' => $userId
+        ));
+
+        $unreadedNotif = [];    
+        $userConversations = $user->getConversations()->getValues();
+
+        foreach($userConversations as $conversation)
+        {
+            
+            $response = $this->_em->getRepository(\App\Entity\User::class)->findNumberOfUnreadedMessages($userId, $conversation->getId());
+            $unreadedMsgs = isset($response[0]['count']) ? (int) $response[0]['count'] : 0;
+            $unreadedNotif[$conversation->getId()] = $unreadedMsgs;
+        }
+
+        $topic->broadcast(json_encode($unreadedNotif));
     }
 
     /**
@@ -52,9 +87,6 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
-        $user = $this->clientManipulator->getClient($connection);
-        $this->_onlineUsers[$user->getId()] = $user->getUsername();
-        $topic->broadcast(json_encode($this->_onlineUsers));
     }
 
     /**
@@ -67,9 +99,6 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
-        $user = $this->clientManipulator->getClient($connection);
-        unset($this->_onlineUsers[$user->getId()]);
-        $topic->broadcast(json_encode($this->_onlineUsers));
     }
 
     /**

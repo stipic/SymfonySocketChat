@@ -4,14 +4,18 @@ namespace App\Service;
 use App\Entity\Conversation;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Doctrine\Common\Persistence\ObjectManager;
 
 class ConversationHandler
 {
     private $_router;
 
-    public function __construct(Router $router)
+    private $_em;
+
+    public function __construct(Router $router, ObjectManager $em)
     {
         $this->_router = $router;
+        $this->_em = $em;
     }
 
     public function getUserConversations(User $user, Conversation $currentConversation)
@@ -25,13 +29,27 @@ class ConversationHandler
         $sortedConversations = ['channels' => [], 'direct' => [], 'current' => []];
         foreach($userConversations as $singleUserConversation)
         {
+            $numberOfUnreadedMessages = $this->getUserConversationUnreadedMessages($user, $singleUserConversation);
             $conversationRoute = $this->_router->generate('app_conversation', ['id' => $singleUserConversation->getId()]);
             $isActive = false;
             if($singleUserConversation === $currentConversation)
             {
                 $isActive = true;
+                if($numberOfUnreadedMessages > 0)
+                {
+                    // oznaci sve poruke kao procitane
+                    foreach($user->getUnreadedMessages()->getValues() as $unreadedMessage)
+                    {
+                        if($unreadedMessage->getMessageBlock()->getConversation() == $currentConversation)
+                        {
+                            $user->removeUnreadedMessage($unreadedMessage);
+                            $this->_em->persist($user);
+                        }
+                    }
+                    $this->_em->flush();
+                }
             }
-
+            
             if($singleUserConversation->getIsChannel() == true)
             {
                 $sortedConversations['channels'][] = [
@@ -41,7 +59,8 @@ class ConversationHandler
                     'active' => $isActive,
                     'isChannel' => $singleUserConversation->getIsChannel(),
                     'userIdInConversation' => $user->getId(),
-                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic()
+                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic(),
+                    'unreadedMessages' => $numberOfUnreadedMessages
                 ];
 
                 if($isActive === true)
@@ -75,7 +94,8 @@ class ConversationHandler
                     'active' => $isActive,
                     'isChannel' => $singleUserConversation->getIsChannel(),
                     'userIdInConversation' => $userIdInConversation,
-                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic()
+                    'isChannelPublic'=> $singleUserConversation->getIsChannelPublic(),
+                    'unreadedMessages' => $numberOfUnreadedMessages
                 ];
 
                 if($isActive === true)
@@ -87,4 +107,17 @@ class ConversationHandler
 
         return $sortedConversations;
     }
+
+    // metoda vraca broj neprocitanih poruka za jednu konverzaciju od nekog usera
+    public function getUserConversationUnreadedMessages(User $user, Conversation $currentConversation)
+    {
+        $response = $this->_em->getRepository(\App\Entity\User::class)->findNumberOfUnreadedMessages($user->getId(), $currentConversation->getId());
+        if(isset($response[0]))
+        {
+            return (int) $response[0]['count'];
+        }
+
+        return 0;
+    }
+
 }
