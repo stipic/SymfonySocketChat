@@ -43,7 +43,8 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
     public function onPush(Topic $topic, $request, $payload, $provider)
     {
         $userId = $payload['userId'];
-        $unreadedNotif = $this->getConversationNotificationArr($userId);
+        $conversationId = $payload['conversationId'];
+        $unreadedNotif = $this->getConversationNotificationArr($userId, $conversationId);
 
         $topic->broadcast(json_encode($unreadedNotif));
     }
@@ -62,9 +63,10 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
         $user = $this->clientManipulator->getClient($connection);
-
         $userId = $user->getId();
-        $unreadedNotif = $this->getConversationNotificationArr($userId);
+        $conversationId = (int) $event;
+        //@todo provjeriti dali ovaj userid ima pristup ovom conversation-u !!
+        $unreadedNotif = $this->getConversationNotificationArr($userId, $conversationId);
 
         $topic->broadcast(json_encode($unreadedNotif));
     }
@@ -93,24 +95,22 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
     {
     }
 
-    private function getConversationNotificationArr($userId)
+    private function getConversationNotificationArr($userId, $conversationId)
     {
-        $user = $this->_em->getRepository(\App\Entity\User::class)->findOneBy(array(
-            'id' => $userId
+        $conversation = $this->_em->getRepository(\App\Entity\Conversation::class)->findOneBy(array(
+            'id' => $conversationId
         ));
 
-        $unreadedNotif = [];    
-        $userConversations = $user->getConversations()->getValues();
-
-        foreach($userConversations as $conversation)
+        if($conversation !== NULL)
         {
-            
-            $response = $this->_em->getRepository(\App\Entity\User::class)->findNumberOfUnreadedMessages($userId, $conversation->getId());
+            $unreadedNotif = [];
+
+            $response = $this->_em->getRepository(\App\Entity\User::class)->findNumberOfUnreadedMessages($userId, $conversationId);
             $unreadedMsgs = isset($response[0]['count']) ? (int) $response[0]['count'] : 0;
             $unreadedNotif[$conversation->getId()] = $unreadedMsgs;
-        }
 
-        return $unreadedNotif;
+            return $unreadedNotif;
+        }
     }
 
     /**
