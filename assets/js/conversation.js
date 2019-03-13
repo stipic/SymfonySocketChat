@@ -158,7 +158,7 @@ webSocket.on("socket/connect", function(session) {
                 clientInformation.conversationId = cid;
                 subscribeToTopic(clientInformation.wsConversationRoute);
 
-
+                $('#writing-notif-zone').html('');
                 session.publish('unreaded/' + clientInformation.username, cid);
             }
         });
