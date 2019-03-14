@@ -439,14 +439,15 @@ input:checked+.slider:before {
 }
 
 .user-nickname {
-	margin-left: 10px;
+	margin-left: 5px;
 }
 
 .user-details.online i {
-    color: green;
+	color: green;
 }
 
 .user-details i {
+	font-size:14px;
 	vertical-align:middle;
     color: #CCC;
 }
