@@ -84,6 +84,14 @@ webSocket.on("socket/connect", function(session) {
     {
         session.subscribe(topic, function(uri, messageHtml) 
         {
+            // first message..
+            if($("#content").hasClass("empty"))
+            {
+                $("#content").removeClass('empty');
+                $("#content .col-md-12").attr('id', 'org-msg-zone');
+                $("#content .no-messages").remove();
+            }
+
             if(messageHtml.msg.msgType == 'msg_block')
             {
                 Chat.appendMessage(messageHtml.msg.template);
@@ -153,12 +161,12 @@ webSocket.on("socket/connect", function(session) {
 
                 session.unsubscribe(clientInformation.wsConversationRoute);
                 session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+                $('#writing-notif-zone').html('');
                 
                 clientInformation.wsConversationRoute = 'conversation/' + cid;
                 clientInformation.conversationId = cid;
                 subscribeToTopic(clientInformation.wsConversationRoute);
 
-                $('#writing-notif-zone').html('');
                 session.publish('unreaded/' + clientInformation.username, cid);
             }
         });
