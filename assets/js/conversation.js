@@ -161,7 +161,6 @@ webSocket.on("socket/connect", function(session) {
                     $("#msg-section").remove();
                     $(data).insertAfter("#sidebar");
         
-                    scrollToBottom(document.getElementById('content'));
                     window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
 
                     session.unsubscribe(clientInformation.wsConversationRoute);
@@ -177,6 +176,8 @@ webSocket.on("socket/connect", function(session) {
                     $('#loading').hide();
                     $('#content').css({display: 'flex'});
                     $('[data-toggle="tooltip"]').tooltip();
+
+                    scrollToBottom(document.getElementById('content'));
                 }
             });
         }
