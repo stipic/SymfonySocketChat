@@ -1,4 +1,7 @@
 security:
+
+    session_fixation_strategy: invalidate
+
     encoders:
         App\Entity\User: bcrypt
 

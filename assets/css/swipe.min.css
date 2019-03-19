@@ -465,6 +465,11 @@ input:checked+.slider:before {
     border-color: #2196F3;
 }
 
+.discussions li a:active {
+	background-color: #cfe9fc !important;
+	border-color: #000;
+}
+
 .discussions {
     margin-bottom: 20px;
 }
