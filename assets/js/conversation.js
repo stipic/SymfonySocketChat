@@ -150,9 +150,9 @@ webSocket.on("socket/connect", function(session) {
             $('.discussions li').removeClass('active');
             $(this).addClass('active');
 
-            $('#loading').show();
             $('#content').hide();
-            
+            $('#loading').show();
+                       
             $.ajax({
                 url: '/message/' + cid + '/section',
                 type: 'GET',
