@@ -6,4 +6,8 @@ require('popper.js');
 require('./bootstrap.min.js');
 const $ = require('jquery');
 
-$('[data-toggle="tooltip"]').tooltip();
+$(document).ready(function(event) {
+    $('#loading').hide();
+    $('#content').css({display: 'flex'});
+    $('[data-toggle="tooltip"]').tooltip();
+});

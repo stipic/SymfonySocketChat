@@ -6,12 +6,7 @@
                     <div class="container">
                         <div class="col-md-12">
                             <div class="inside">
-                                <a href="#">
-                                    <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-                                </a>
-                                <div class="status">
-                                    <i class="material-icons online">fiber_manual_record</i>
-                                </div>
+                                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="{{ conversations.current.title }}">
                                 <div class="data">
                                     <h5><a href="#">{{ conversations.current.title }}</a></h5>
                                     <span>Active now</span>
@@ -31,6 +26,27 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="content empty" id="loading">
+                    <div class="container">
+                        <div class="col-md-12">
+                            <div class="no-messages">
+                                <div class="lds-roller">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <p>Loading</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {% if messages is empty %}
                     <div class="content empty" id="content">
                         <div class="container">

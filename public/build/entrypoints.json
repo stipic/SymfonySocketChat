@@ -4,22 +4,22 @@
       "js": [
         "/build/runtime.fa8f03f5.js",
         "/build/1.efdb0be1.js",
-        "/build/0.2c992d69.js",
+        "/build/0.37ffaf69.js",
         "/build/app.bb2dea7d.js"
       ],
       "css": [
-        "/build/0.991b5662.css"
+        "/build/0.faa63c43.css"
       ]
     },
     "conversation": {
       "js": [
         "/build/runtime.fa8f03f5.js",
         "/build/1.efdb0be1.js",
-        "/build/0.2c992d69.js",
-        "/build/conversation.9c1b33ef.js"
+        "/build/0.37ffaf69.js",
+        "/build/conversation.909586de.js"
       ],
       "css": [
-        "/build/0.991b5662.css"
+        "/build/0.faa63c43.css"
       ]
     }
   }

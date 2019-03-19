@@ -142,34 +142,44 @@ webSocket.on("socket/connect", function(session) {
 
         event.preventDefault();
     
-        $('.discussions li').removeClass('active');
-        $(this).addClass('active');
-    
         var cid = $(this).attr('data-cid');
-        var stateObj = { foo: "bar" };
+        if(cid != clientInformation.conversationId)
+        {
+            var stateObj = { foo: "bar" };
+
+            $('.discussions li').removeClass('active');
+            $(this).addClass('active');
+
+            $('#loading').show();
+            $('#content').hide();
+            
+            $.ajax({
+                url: '/message/' + cid + '/section',
+                type: 'GET',
+                success: function(data) 
+                {
+                    $("#msg-section").remove();
+                    $(data).insertAfter("#sidebar");
         
-        $.ajax({
-            url: '/message/' + cid + '/section',
-            type: 'GET',
-            success: function(data) 
-            {
-                $("#msg-section").remove();
-                $(data).insertAfter("#sidebar");
-    
-                scrollToBottom(document.getElementById('content'));
-                window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
+                    scrollToBottom(document.getElementById('content'));
+                    window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
 
-                session.unsubscribe(clientInformation.wsConversationRoute);
-                session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
-                $('#writing-notif-zone').html('');
-                
-                clientInformation.wsConversationRoute = 'conversation/' + cid;
-                clientInformation.conversationId = cid;
-                subscribeToTopic(clientInformation.wsConversationRoute);
+                    session.unsubscribe(clientInformation.wsConversationRoute);
+                    session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+                    $('#writing-notif-zone').html('');
+                    
+                    clientInformation.wsConversationRoute = 'conversation/' + cid;
+                    clientInformation.conversationId = cid;
+                    subscribeToTopic(clientInformation.wsConversationRoute);
 
-                session.publish('unreaded/' + clientInformation.username, cid);
-            }
-        });
+                    session.publish('unreaded/' + clientInformation.username, cid);
+
+                    $('#loading').hide();
+                    $('#content').css({display: 'flex'});
+                    $('[data-toggle="tooltip"]').tooltip();
+                }
+            });
+        }
     });
 
     session.subscribe('online', function(uri, payload) 
