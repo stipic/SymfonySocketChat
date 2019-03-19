@@ -25,7 +25,6 @@ class ConversationHandler
         // popis SVIH userId-eva koji su u tom razgovoru.
 
         $userConversations = $user->getConversations()->getValues();
-
         $sortedConversations = ['channels' => [], 'direct' => [], 'current' => []];
         foreach($userConversations as $singleUserConversation)
         {
@@ -55,6 +54,7 @@ class ConversationHandler
                 $sortedConversations['channels'][] = [
                     'id' => $singleUserConversation->getId(),
                     'title' => $singleUserConversation->getChannelName(),
+                    'subtitle' => 'Channel.',
                     'route' => $conversationRoute,
                     'active' => $isActive,
                     'isChannel' => $singleUserConversation->getIsChannel(),
@@ -70,10 +70,12 @@ class ConversationHandler
             }
             else 
             {
-                $conversationName = $singleUserConversation->getConversationNameForOwner();
+                $conversationName = $singleUserConversation->getConversationNameForOwner()->getDisplayName();
+                $conversationSubtitle = $singleUserConversation->getConversationNameForOwner()->getUsername();
                 if($singleUserConversation->getCreatedBy() != $user)
                 {
-                    $conversationName = $singleUserConversation->getConversationNameForGuest();
+                    $conversationName = $singleUserConversation->getConversationNameForGuest()->getDisplayName();
+                    $conversationSubtitle = $singleUserConversation->getConversationNameForGuest()->getUsername();
                 }
 
                 //@todo ovo napraviti pametnije, ali moramo proci kroz ovaj conversation i pronaci sami sebe u tom razgovoru
@@ -90,6 +92,7 @@ class ConversationHandler
                 $sortedConversations['direct'][] = [
                     'id' => $singleUserConversation->getId(),
                     'title' => $conversationName,
+                    'subtitle' => $conversationSubtitle,
                     'route' => $conversationRoute,
                     'active' => $isActive,
                     'isChannel' => $singleUserConversation->getIsChannel(),

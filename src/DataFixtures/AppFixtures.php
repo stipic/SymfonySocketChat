@@ -105,8 +105,6 @@ class AppFixtures extends Fixture
                 if($firstUserKey !== $secondUserKey)
                 {
                     $conversation = new Conversation();
-                    $conversation->setConversationNameForGuest($users[$firstUserKey]['displayName']);
-                    $conversation->setConversationNameForOwner($users[$secondUserKey]['displayName']);
                     $conversation->setIsChannel(false);
                     $conversation->setDeleted(false);
 
@@ -115,6 +113,9 @@ class AppFixtures extends Fixture
 
                     $secondUserReferenceId = 'user-' . $secondUserKey;
                     $secondUserObject = $this->getReference($secondUserReferenceId);
+
+                    $conversation->setConversationNameForGuest($firstUserObject);
+                    $conversation->setConversationNameForOwner($secondUserObject);
 
                     $conversation->setCreatedBy($firstUserObject);
                     $conversation->addUserToConversation($firstUserObject);

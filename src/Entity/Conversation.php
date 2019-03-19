@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\User;
 
 /**
  * @ORM\Entity
@@ -29,7 +30,8 @@ class Conversation
      * Kada se korisnik registrira ili bude registriran on kreira razgovore između sebe i svakog drugog korisnika
      * Njemu cemo pokazati ime drugog korisnika
      * 
-     * @ORM\Column(type="string", length=255, options={"default": ""}, nullable=true)
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="conversationNameForOwner", referencedColumnName="id")
      */
     private $conversationNameForOwner;
 
@@ -37,7 +39,8 @@ class Conversation
      * Naziv koji ce se prikazivati onom tko je ubacen u ovaj razgovor od strane nekog drugog korisnika
      * Njemu cemo prikazivati ime vlasnika razgovora
      * 
-     * @ORM\Column(type="string", length=255, options={"default": ""}, nullable=true)
+     * @ORM\ManyToOne(targetEntity="User")
+     * @ORM\JoinColumn(name="conversationNameForGuest", referencedColumnName="id")
      */
     private $conversationNameForGuest;
 
@@ -348,7 +351,7 @@ class Conversation
      *
      * @return  self
      */ 
-    public function setConversationNameForOwner($conversationNameForOwner)
+    public function setConversationNameForOwner(User $conversationNameForOwner)
     {
         $this->conversationNameForOwner = $conversationNameForOwner;
 
@@ -368,7 +371,7 @@ class Conversation
      *
      * @return  self
      */ 
-    public function setConversationNameForGuest($conversationNameForGuest)
+    public function setConversationNameForGuest(User $conversationNameForGuest)
     {
         $this->conversationNameForGuest = $conversationNameForGuest;
 
