@@ -36,7 +36,13 @@
                                     </form>
                                 </div>		
                                 <div class="discussions">
-                                    <h1>Channels</h1>
+                                    <h1>
+                                        Channels
+                                        {% if is_granted('ROLE_MODERATOR') %}
+                                            <button class="btn" data-toggle="modal" data-target="#new-channel"><i class="material-icons">add_circle_outline</i></button>
+                                        {% endif %}
+                                    </h1>
+                                    
                                     <ul>
                                         {% for c in conversations.channels %}
 
@@ -46,7 +52,12 @@
                                     </ul>
                                 </div>		
                                 <div class="discussions">
-                                    <h1>Conversations</h1>
+                                    <h1>
+                                        Conversations
+                                        {% if is_granted('ROLE_MODERATOR') %}
+                                            <button class="btn" data-toggle="modal" data-target="#new-conversation"><i class="material-icons">add_circle_outline</i></button>
+                                        {% endif %}
+                                    </h1>
                                     <ul>
                                         {% for c in conversations.direct %}
 
@@ -63,6 +74,10 @@
             </div>
             
             {% include 'inc/message-section.inc.html.twig' %}
+
+            {% include 'inc/create-new-channel.inc.html.twig' %}
+
+            {% include 'inc/create-new-conversation.inc.html.twig' %}
             
         </div> 
     </main>
