@@ -1521,8 +1521,8 @@ input:checked+.slider:before {
 }
 
 .main .chat .top {
-	padding: 26.5px 0;
-	background: #fff;
+	padding: 12.5px 0;
+	background: #fbfbfb;
 	border-bottom: 2px solid #fbfbfb
 }
 
@@ -1605,7 +1605,7 @@ input:checked+.slider:before {
 .main .chat .content {
 	display: flex;
 	padding: 20px 0 0;
-	height: calc(100vh - 218px);
+	height: calc(100vh - 140px);
 	overflow-y: scroll
 }
 
@@ -1884,7 +1884,7 @@ input:checked+.slider:before {
 .main .chat .bottom {
 	display: flex;
 	align-items: center;
-	padding: 30px 0;
+	/* padding: 30px 0; */
 	border-top: 2px solid #fbfbfb
 }
 
