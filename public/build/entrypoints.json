@@ -3,23 +3,22 @@
     "app": {
       "js": [
         "/build/runtime.fa8f03f5.js",
-        "/build/1.efdb0be1.js",
-        "/build/0.37ffaf69.js",
-        "/build/app.bb2dea7d.js"
+        "/build/0.a73f51e2.js",
+        "/build/app.08d382fc.js"
       ],
       "css": [
-        "/build/0.a920893f.css"
+        "/build/app.7e857e2a.css"
       ]
     },
     "conversation": {
       "js": [
         "/build/runtime.fa8f03f5.js",
-        "/build/1.efdb0be1.js",
-        "/build/0.37ffaf69.js",
-        "/build/conversation.b77508d0.js"
+        "/build/0.a73f51e2.js",
+        "/build/1.cb4cec80.js",
+        "/build/conversation.5642df27.js"
       ],
       "css": [
-        "/build/0.a920893f.css"
+        "/build/conversation.7e857e2a.css"
       ]
     }
   }

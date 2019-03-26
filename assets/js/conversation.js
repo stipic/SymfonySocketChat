@@ -1,5 +1,49 @@
 require('./app.js');
+
 import Tagify from '@yaireo/tagify';
+import qq from 'fine-uploader';
+
+var uploader = new qq.FineUploader({
+    element: document.getElementById('fine-uploader'),
+    request: {
+        endpoint: '/_uploader/gallery/upload',
+        params: {
+            conversationId: clientInformation.conversationId
+        }
+    },
+});
+
+$(document).on("click", "#file-picker", function(event) {
+    event.preventDefault();
+    $('.qq-upload-button-selector.qq-upload-button').find('input').trigger('click');
+});
+
+
+$(document).on("click","#emoji-picker",function(e){
+    e.preventDefault();
+    e.stopPropagation();
+     $('.intercom-composer-emoji-popover').toggleClass("active");
+ });
+ 
+ $(document).click(function (e) {
+     if ($(e.target).attr('class') != '.intercom-composer-emoji-popover' && $(e.target).parents(".intercom-composer-emoji-popover").length == 0) {
+         $(".intercom-composer-emoji-popover").removeClass("active");
+     }
+ });
+ 
+ $(document).on("click",".intercom-emoji-picker-emoji",function(e){
+     $("#form-message").append($(this).html());
+ });
+ 
+ $('.intercom-composer-popover-input').on('input', function() {
+     var query = this.value;
+     if(query != ""){
+       $(".intercom-emoji-picker-emoji:not([title*='"+query+"'])").hide();
+     }
+     else{
+       $(".intercom-emoji-picker-emoji").show();
+     }
+ });
 
 
 // var input = document.querySelector('input[name=participant]'),

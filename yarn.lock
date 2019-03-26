@@ -2516,6 +2516,11 @@ findup-sync@^2.0.0:
     micromatch "^3.0.4"
     resolve-dir "^1.0.1"
 
+fine-uploader@^5.16.2:
+  version "5.16.2"
+  resolved "https://registry.yarnpkg.com/fine-uploader/-/fine-uploader-5.16.2.tgz#0d878da1cd2753f80683ac091df5daff9ffb8c44"
+  integrity sha1-DYeNoc0nU/gGg6wJHfXa/5/7jEQ=
+
 flush-write-stream@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/flush-write-stream/-/flush-write-stream-1.1.1.tgz#8dd7d873a1babc207d94ead0c2e0e44276ebf2e8"
