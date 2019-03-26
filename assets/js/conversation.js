@@ -3,6 +3,15 @@ require('./app.js');
 import Tagify from '@yaireo/tagify';
 import qq from 'fine-uploader';
 
+var uploader = new qq.FineUploader({
+    element: document.getElementById('fine-uploader'),
+    request: {
+        endpoint: '/_uploader/gallery/upload',
+        params: {
+            conversationId: cid
+        }
+    },
+});
 $(document).on("click", "#file-picker", function(event) {
     event.preventDefault();
     $('.qq-upload-button-selector.qq-upload-button').find('input').trigger('click');
@@ -227,7 +236,7 @@ webSocket.on("socket/connect", function(session) {
 
                     scrollToBottom(document.getElementById('content'));
                     $('#fine-uploader').unbind().empty();
-                    var uploader = new qq.FineUploader({
+                    uploader = new qq.FineUploader({
                         element: document.getElementById('fine-uploader'),
                         request: {
                             endpoint: '/_uploader/gallery/upload',
