@@ -1924,7 +1924,7 @@ input:checked+.slider:before {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: 10px
+	left: 15px
 }
 
 .main .chat .bottom .btn.files {
@@ -1932,7 +1932,7 @@ input:checked+.slider:before {
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: 40px
+	left: 45px
 }
 
 .main .chat .bottom .btn.send {
