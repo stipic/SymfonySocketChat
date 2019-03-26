@@ -8,7 +8,7 @@ var uploader = new qq.FineUploader({
     request: {
         endpoint: '/_uploader/gallery/upload',
         params: {
-            conversationId: cid
+            conversationId: clientInformation.conversationId
         }
     },
 });
