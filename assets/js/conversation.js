@@ -2,6 +2,11 @@ require('./app.js');
 
 import Tagify from '@yaireo/tagify';
 import qq from 'fine-uploader';
+import Offline from 'offline-js';
+
+import defaultTheme from 'offline-js/themes/offline-theme-default.css';
+import defaultThemeLang from 'offline-js/themes/offline-language-english.css';
+import Toastify from 'toastify-js'
 
 $(document).on("click", "#file-picker", function(event) {
     event.preventDefault();
@@ -51,277 +56,298 @@ $(document).on("click","#emoji-picker",function(e){
 var host = window.location.hostname;
 // host = '5.189.166.104';
 
-var webSocket = WS.connect("ws://" + host + ":5510");
+main();
+function main() 
+{
+    var webSocket = WS.connect("ws://" + host + ":5510");
+    webSocket.on("socket/connect", function(session) {
 
-webSocket.on("socket/connect", function(session) {
+        Toastify({
+            text: "Connected!",
+            duration: 3000,
+            newWindow: true,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            positionLeft: true, // `true` or `false`
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
 
-    function scrollToBottom(el) { el.scrollTop = el.scrollHeight; }
-    scrollToBottom(document.getElementById('content'));
+        function scrollToBottom(el) { el.scrollTop = el.scrollHeight; }
+        scrollToBottom(document.getElementById('content'));
 
-    var Chat = 
-    {
-        appendMessage: function(messageHtml)
+        var Chat = 
         {
-            $('#org-msg-zone').append(messageHtml);
+            appendMessage: function(messageHtml)
+            {
+                $('#org-msg-zone').append(messageHtml);
 
-            scrollToBottom(document.getElementById('content'));
-        },
-        appendMessageChunk: function(messageHtml)
-        {
-            console.log('CHUNK #1');
-            $('#org-msg-zone .message:last').find('.text').append(messageHtml);
+                scrollToBottom(document.getElementById('content'));
+            },
+            appendMessageChunk: function(messageHtml)
+            {
+                console.log('CHUNK #1');
+                $('#org-msg-zone .message:last').find('.text').append(messageHtml);
 
-            scrollToBottom(document.getElementById('content'));
-        }
-    };
+                scrollToBottom(document.getElementById('content'));
+            }
+        };
 
-    $(document).on("click", "#submit-message", function(event) {
-        event.preventDefault();
-        // napravi POST request.
-        var msg = $("#form-message").val();
-        
-        if(msg) 
-        {
-            $.ajax({
-                url: '/message/' + clientInformation.conversationId + '/new',
-                type: 'POST',
-                data: {
-                    'message': msg
+        $(document).on("click", "#submit-message", function(event) {
+            event.preventDefault();
+            // napravi POST request.
+            var msg = $("#form-message").val();
+            
+            if(msg) 
+            {
+                $.ajax({
+                    url: '/message/' + clientInformation.conversationId + '/new',
+                    type: 'POST',
+                    data: {
+                        'message': msg
+                    },
+                    complete: function(data) 
+                    {
+                    }
+                });
+            }
+            
+            // $("#form-message").reset();
+            $("#form-message").val('').change();
+            $("#form-message").html('');
+
+            clientInformation.isWriting = false;
+            session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
+        });
+
+        document.getElementById("form-message").focus();
+        $(document).on("keypress", "#form-message", function(event){
+            if(event.keyCode === 13 ) {
+                event.preventDefault();
+                $('#submit-message').trigger('click');
+                $("#form-message").val("");
+            }
+        });
+
+        $(document).on("input", "#form-message", function(event) {
+            event.preventDefault();
+            var msg = $("#form-message").val();
+
+            if(msg.length > 0 && clientInformation.isWriting == false) 
+            {
+                clientInformation.isWriting = true;
+                session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
+            }
+            else if(msg.length == 0 && clientInformation.isWriting == true) 
+            {
+                clientInformation.isWriting = false;
+                session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
+            }
+        });
+
+        var uploader = new qq.FineUploader({
+            element: document.getElementById('fine-uploader'),
+            request: {
+                endpoint: '/_uploader/gallery/upload',
+                params: {
+                    conversationId: clientInformation.conversationId
+                }
+            },
+            multiple: false,
+            autoUpload: false,
+            deleteFile: {
+                enabled: false,
+            },
+            callbacks: {
+                onSubmit: function(id) {
+                    var file = this.getFile(id);
+                    processUpload(file, this);
                 },
-                complete: function(data) 
+                onUpload: function() {
+                }
+            }
+        });
+
+        var isAskedForConfirmUpload = false;
+        function processUpload(file, uploader)
+        {
+            $('#new-upload').modal('show');
+            isAskedForConfirmUpload = true;
+            $(document).on("click", "#confirm-upload", function(event) {
+                event.preventDefault();
+                if(isAskedForConfirmUpload == true)
                 {
+                    isAskedForConfirmUpload = false;
+                    uploader.uploadStoredFiles();
+                    $('#new-upload').modal('hide');
                 }
             });
         }
-        
-        // $("#form-message").reset();
-        $("#form-message").val('').change();
-        $("#form-message").html('');
 
-        clientInformation.isWriting = false;
-        session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
-    });
-
-    document.getElementById("form-message").focus();
-    $(document).on("keypress", "#form-message", function(event){
-        if(event.keyCode === 13 ) {
-            event.preventDefault();
-            $('#submit-message').trigger('click');
-            $("#form-message").val("");
-        }
-    });
-
-    $(document).on("input", "#form-message", function(event) {
-        event.preventDefault();
-        var msg = $("#form-message").val();
-
-        if(msg.length > 0 && clientInformation.isWriting == false) 
+        subscribeToTopic(clientInformation.wsConversationRoute);
+        function subscribeToTopic(topic)
         {
-            clientInformation.isWriting = true;
-            session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
-        }
-        else if(msg.length == 0 && clientInformation.isWriting == true) 
-        {
-            clientInformation.isWriting = false;
-            session.publish(clientInformation.wsConversationRoute + '/notifications', clientInformation.isWriting);
-        }
-    });
-
-    var uploader = new qq.FineUploader({
-        element: document.getElementById('fine-uploader'),
-        request: {
-            endpoint: '/_uploader/gallery/upload',
-            params: {
-                conversationId: clientInformation.conversationId
-            }
-        },
-        multiple: false,
-        autoUpload: false,
-        deleteFile: {
-            enabled: false,
-        },
-        callbacks: {
-            onSubmit: function(id) {
-                var file = this.getFile(id);
-                processUpload(file, this);
-            },
-            onUpload: function() {
-            }
-        }
-    });
-
-    var isAskedForConfirmUpload = false;
-    function processUpload(file, uploader)
-    {
-        $('#new-upload').modal('show');
-        isAskedForConfirmUpload = true;
-        $(document).on("click", "#confirm-upload", function(event) {
-            event.preventDefault();
-            if(isAskedForConfirmUpload == true)
+            session.subscribe(topic, function(uri, messageHtml) 
             {
-                isAskedForConfirmUpload = false;
-                uploader.uploadStoredFiles();
-                $('#new-upload').modal('hide');
-            }
-        });
-    }
+                // first message..
+                if($("#content").hasClass("empty"))
+                {
+                    $("#content").removeClass('empty');
+                    $("#content .col-md-12").attr('id', 'org-msg-zone');
+                    $("#content .no-messages").remove();
+                }
 
-    subscribeToTopic(clientInformation.wsConversationRoute);
-    function subscribeToTopic(topic)
-    {
-        session.subscribe(topic, function(uri, messageHtml) 
-        {
-            // first message..
-            if($("#content").hasClass("empty"))
-            {
-                $("#content").removeClass('empty');
-                $("#content .col-md-12").attr('id', 'org-msg-zone');
-                $("#content .no-messages").remove();
-            }
+                if(messageHtml.msg.msgType == 'msg_block')
+                {
+                    Chat.appendMessage(messageHtml.msg.template);
+                }
+                else 
+                {
+                    Chat.appendMessageChunk(messageHtml.msg.template);
+                }
+            });
 
-            if(messageHtml.msg.msgType == 'msg_block')
+            session.subscribe(topic + '/notifications', function(uri, payload) 
             {
-                Chat.appendMessage(messageHtml.msg.template);
-            }
-            else 
-            {
-                Chat.appendMessageChunk(messageHtml.msg.template);
-            }
-        });
-
-        session.subscribe(topic + '/notifications', function(uri, payload) 
-        {
-            console.log(payload);
-            var responsePayload = JSON.parse(payload);
-            var html = `
-            <div class="message" data-writing="` + clientInformation.username + `">
-                <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
-                <div class="text-main">
-                    <div class="text-group">
-                        <div class="text typing">
-                            <div class="wave">
-                                <span class="dot"></span>
-                                <span class="dot"></span>
-                                <span class="dot"></span>
+                console.log(payload);
+                var responsePayload = JSON.parse(payload);
+                var html = `
+                <div class="message" data-writing="` + clientInformation.username + `">
+                    <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="Keith">
+                    <div class="text-main">
+                        <div class="text-group">
+                            <div class="text typing">
+                                <div class="wave">
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                    <span class="dot"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>`;
+                </div>`;
 
-            $('[data-writing="' + clientInformation.username + '"]').remove();
-            for(var key in responsePayload) 
-            {
-                if(
-                    responsePayload.hasOwnProperty(key) && 
-                    !$('[data-writing="' + clientInformation.username + '"]').length && 
-                    clientInformation.username != key
-                ) 
+                $('[data-writing="' + clientInformation.username + '"]').remove();
+                for(var key in responsePayload) 
                 {
-                    $('#writing-notif-zone').append(html);
-                    scrollToBottom(document.getElementById('content'));
-                }
-            }   
-        });
-    }
-
-    $(document).on("click", ".discussions li", function(event) {
-
-        event.preventDefault();
-    
-        var cid = $(this).attr('data-cid');
-        if(cid != clientInformation.conversationId)
-        {
-            var stateObj = { foo: "bar" };
-
-            $('.discussions li').removeClass('active');
-            $(this).addClass('active');
-
-            $('#content').hide();
-            $('#loading').show();
-                       
-            $.ajax({
-                url: '/message/' + cid + '/section',
-                type: 'GET',
-                success: function(data) 
-                {
-                    $("#msg-section").remove();
-                    $(data).insertAfter("#sidebar");
-        
-                    window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
-
-                    session.unsubscribe(clientInformation.wsConversationRoute);
-                    session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
-                    $('#writing-notif-zone').html('');
-                    
-                    clientInformation.wsConversationRoute = 'conversation/' + cid;
-                    clientInformation.conversationId = cid;
-                    subscribeToTopic(clientInformation.wsConversationRoute);
-
-                    session.publish('unreaded/' + clientInformation.username, cid);
-
-                    $('#loading').hide();
-                    $('#content').css({display: 'flex'});
-                    $('[data-toggle="tooltip"]').tooltip();
-
-                    scrollToBottom(document.getElementById('content'));
-                    
-                    uploader.clearStoredFiles();
-                    uploader.setParams({
-                        conversationId: clientInformation.conversationId
-                    });
-                }
+                    if(
+                        responsePayload.hasOwnProperty(key) && 
+                        !$('[data-writing="' + clientInformation.username + '"]').length && 
+                        clientInformation.username != key
+                    ) 
+                    {
+                        $('#writing-notif-zone').append(html);
+                        scrollToBottom(document.getElementById('content'));
+                    }
+                }   
             });
         }
-    });
 
-    session.subscribe('online', function(uri, payload) 
-    {
-        var responsePayload = JSON.parse(payload);
+        $(document).on("click", ".discussions li", function(event) {
+
+            event.preventDefault();
         
-        $('li[data-usid]').each(function(event) {
+            var cid = $(this).attr('data-cid');
+            if(cid != clientInformation.conversationId)
+            {
+                var stateObj = { foo: "bar" };
 
-            var userId = $(this).attr('data-usid');
+                $('.discussions li').removeClass('active');
+                $(this).addClass('active');
 
-            $('li[data-usid="'+userId+'"]').find('.user-details').removeClass('online');
+                $('#content').hide();
+                $('#loading').show();
+                        
+                $.ajax({
+                    url: '/message/' + cid + '/section',
+                    type: 'GET',
+                    success: function(data) 
+                    {
+                        $("#msg-section").remove();
+                        $(data).insertAfter("#sidebar");
+            
+                        window.history.pushState(stateObj, 'Conversation', '/conversation/' + cid);
 
+                        session.unsubscribe(clientInformation.wsConversationRoute);
+                        session.unsubscribe(clientInformation.wsConversationRoute + '/notifications');
+                        $('#writing-notif-zone').html('');
+                        
+                        clientInformation.wsConversationRoute = 'conversation/' + cid;
+                        clientInformation.conversationId = cid;
+                        subscribeToTopic(clientInformation.wsConversationRoute);
+
+                        session.publish('unreaded/' + clientInformation.username, cid);
+
+                        $('#loading').hide();
+                        $('#content').css({display: 'flex'});
+                        $('[data-toggle="tooltip"]').tooltip();
+
+                        scrollToBottom(document.getElementById('content'));
+                        
+                        uploader.clearStoredFiles();
+                        uploader.setParams({
+                            conversationId: clientInformation.conversationId
+                        });
+                    }
+                });
+            }
+        });
+
+        session.subscribe('online', function(uri, payload) 
+        {
+            var responsePayload = JSON.parse(payload);
+            
+            $('li[data-usid]').each(function(event) {
+
+                var userId = $(this).attr('data-usid');
+
+                $('li[data-usid="'+userId+'"]').find('.user-details').removeClass('online');
+
+                for(var key in responsePayload)
+                {
+                    if(responsePayload.hasOwnProperty(key))
+                    {
+                        if(key == userId)
+                        {
+                            $('li[data-usid="'+userId+'"]').find('.user-details').addClass('online');
+                        }
+                    }
+                }
+            });
+        });
+
+        session.subscribe('unreaded/' + clientInformation.username , function (uri, payload) {
+
+            console.log('unreaded: ', payload);
+            var responsePayload = JSON.parse(payload);
             for(var key in responsePayload)
             {
                 if(responsePayload.hasOwnProperty(key))
                 {
-                    if(key == userId)
+                    var injectVal = '';
+                    if(responsePayload[key] > 0)
                     {
-                        $('li[data-usid="'+userId+'"]').find('.user-details').addClass('online');
+                        injectVal = responsePayload[key];
                     }
+
+                    $("li[data-cid='" + key + "'] .user-nickname span:last").html(injectVal);
                 }
             }
         });
+
+        console.log("Successfully Connected!");
+    })
+
+    webSocket.on("socket/disconnect", function(error) {
+        setTimeout(main, 1000)
+        console.log("Disconnected for " + error.reason + " with code " + error.code);
+        Toastify({
+            text: "Disconnected, trying to reconnect...",
+            duration: 1000,
+            newWindow: true,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            positionLeft: true, // `true` or `false`
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
     });
-
-    session.subscribe('unreaded/' + clientInformation.username , function (uri, payload) {
-
-        console.log('unreaded: ', payload);
-        var responsePayload = JSON.parse(payload);
-        for(var key in responsePayload)
-        {
-            if(responsePayload.hasOwnProperty(key))
-            {
-                var injectVal = '';
-                if(responsePayload[key] > 0)
-                {
-                    injectVal = responsePayload[key];
-                }
-
-                $("li[data-cid='" + key + "'] .user-nickname span:last").html(injectVal);
-            }
-        }
-    });
-
-    console.log("Successfully Connected!");
-})
-
-webSocket.on("socket/disconnect", function(error) {
-
-    console.log("Disconnected for " + error.reason + " with code " + error.code);
-    location.reload();
-})
+}
