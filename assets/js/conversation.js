@@ -127,48 +127,42 @@ webSocket.on("socket/connect", function(session) {
         }
     });
 
-    initUploader();
-    function initUploader()
-    {
-        $('#fine-uploader').unbind().empty();
-        var uploader = new qq.FineUploader({
-            element: document.getElementById('fine-uploader'),
-            request: {
-                endpoint: '/_uploader/gallery/upload',
-                params: {
-                    conversationId: clientInformation.conversationId
-                }
-            },
-            multiple: false,
-            autoUpload: false,
-            deleteFile: {
-                enabled: false,
-            },
-            callbacks: {
-                onSubmit: function(id) {
-                    var file = this.getFile(id);
-                    processUpload(file, this);
-                }
+    var uploader = new qq.FineUploader({
+        element: document.getElementById('fine-uploader'),
+        request: {
+            endpoint: '/_uploader/gallery/upload',
+            params: {
+                conversationId: clientInformation.conversationId
             }
-        });
-    }
+        },
+        multiple: false,
+        autoUpload: false,
+        deleteFile: {
+            enabled: false,
+        },
+        callbacks: {
+            onSubmit: function(id) {
+                var file = this.getFile(id);
+                processUpload(file, this);
+            },
+            onUpload: function() {
+            }
+        }
+    });
 
     var isAskedForConfirmUpload = false;
     function processUpload(file, uploader)
     {
-        console.log(file);
         $('#new-upload').modal('show');
-        $('#new-upload').on('shown.bs.modal', function (e) {
-            isAskedForConfirmUpload = true;
-            $(document).on("click", "#confirm-upload", function(event) {
-                event.preventDefault();
-                if(isAskedForConfirmUpload == true)
-                {
-                    isAskedForConfirmUpload = false;
-                    uploader.uploadStoredFiles();
-                    $('#new-upload').modal('hide');
-                }
-            });
+        isAskedForConfirmUpload = true;
+        $(document).on("click", "#confirm-upload", function(event) {
+            event.preventDefault();
+            if(isAskedForConfirmUpload == true)
+            {
+                isAskedForConfirmUpload = false;
+                uploader.uploadStoredFiles();
+                $('#new-upload').modal('hide');
+            }
         });
     }
 
@@ -272,7 +266,10 @@ webSocket.on("socket/connect", function(session) {
 
                     scrollToBottom(document.getElementById('content'));
                     
-                    initUploader();
+                    uploader.clearStoredFiles();
+                    uploader.setParams({
+                        conversationId: clientInformation.conversationId
+                    });
                 }
             });
         }
