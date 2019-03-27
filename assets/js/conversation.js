@@ -3,15 +3,6 @@ require('./app.js');
 import Tagify from '@yaireo/tagify';
 import qq from 'fine-uploader';
 
-var uploader = new qq.FineUploader({
-    element: document.getElementById('fine-uploader'),
-    request: {
-        endpoint: '/_uploader/gallery/upload',
-        params: {
-            conversationId: clientInformation.conversationId
-        }
-    },
-});
 $(document).on("click", "#file-picker", function(event) {
     event.preventDefault();
     $('.qq-upload-button-selector.qq-upload-button').find('input').trigger('click');
@@ -136,6 +127,51 @@ webSocket.on("socket/connect", function(session) {
         }
     });
 
+    initUploader();
+    function initUploader()
+    {
+        $('#fine-uploader').unbind().empty();
+        var uploader = new qq.FineUploader({
+            element: document.getElementById('fine-uploader'),
+            request: {
+                endpoint: '/_uploader/gallery/upload',
+                params: {
+                    conversationId: clientInformation.conversationId
+                }
+            },
+            multiple: false,
+            autoUpload: false,
+            deleteFile: {
+                enabled: false,
+            },
+            callbacks: {
+                onSubmit: function(id) {
+                    var file = this.getFile(id);
+                    processUpload(file, this);
+                }
+            }
+        });
+    }
+
+    var isAskedForConfirmUpload = false;
+    function processUpload(file, uploader)
+    {
+        console.log(file);
+        $('#new-upload').modal('show');
+        $('#new-upload').on('shown.bs.modal', function (e) {
+            isAskedForConfirmUpload = true;
+            $(document).on("click", "#confirm-upload", function(event) {
+                event.preventDefault();
+                if(isAskedForConfirmUpload == true)
+                {
+                    isAskedForConfirmUpload = false;
+                    uploader.uploadStoredFiles();
+                    $('#new-upload').modal('hide');
+                }
+            });
+        });
+    }
+
     subscribeToTopic(clientInformation.wsConversationRoute);
     function subscribeToTopic(topic)
     {
@@ -235,16 +271,8 @@ webSocket.on("socket/connect", function(session) {
                     $('[data-toggle="tooltip"]').tooltip();
 
                     scrollToBottom(document.getElementById('content'));
-                    $('#fine-uploader').unbind().empty();
-                    uploader = new qq.FineUploader({
-                        element: document.getElementById('fine-uploader'),
-                        request: {
-                            endpoint: '/_uploader/gallery/upload',
-                            params: {
-                                conversationId: cid
-                            }
-                        },
-                    });
+                    
+                    initUploader();
                 }
             });
         }

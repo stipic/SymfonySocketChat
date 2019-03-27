@@ -21,4 +21,10 @@ Encore
     .autoProvidejQuery()
 ;
 
-module.exports = Encore.getWebpackConfig();
+const config = Encore.getWebpackConfig();
+config.watchOptions = {
+    poll: true,
+};
+
+// Export the final configuration
+module.exports = config;
