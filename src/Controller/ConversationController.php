@@ -9,55 +9,67 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Conversation;
 use App\Form\ConversationFormType;
 use App\Service\ConversationHandler;
+use App\Entity\User;
 
 class ConversationController extends Controller
 {
     /**
-     * @Route("/conversation/new", name="app_new_conversation")
-     * @Method({"GET"})
+     * @Route("/channel/new", name="app_new_channel", condition="request.isXmlHttpRequest()")
+     * @Method({"POST"})
      */
-    public function newConversation(Request $request)
+    public function newChannel(Request $request)
     {
         $this->denyAccessUnlessGranted('ROLE_MODERATOR');
 
-        $conversation = new Conversation();
-        $userRepository = $this->get('doctrine')->getManager()->getRepository('App:User');
-        $users = $userRepository->findAll();
-        
-        $form = $this->createForm(ConversationFormType::class, $conversation, [
-            'user' => $this->getUser()
-        ]);
-        $form->handleRequest($request);
+        $em = $this->get('doctrine')->getManager();
+        $userRepository = $em->getRepository(User::class);
 
-        if($form->isSubmitted() && $form->isValid()) 
+        $channelName = $request->get('channelName');
+        $channelIsPrivate = $request->get('channelIsPrivate');
+        $channelUsers = $request->get('channelUsers');
+
+        if($channelIsPrivate !== NULL)
         {
-            $entityManager = $this->getDoctrine()->getManager();
+            $channelIsPrivate = true;
 
-            $name = $form->get('channelName')->getData();
-            $selectedUsers = $form->get('users')->getData()->getValues();
+            $users = explode(',', $channelUsers);
+            $users = $userRepository->findBy([
+                'username' => $users
+            ]);
 
-            $conversation->setChannelName($name);
-            $conversation->setCreatedBy($this->getUser());
-            $conversation->setIsChannel(true);
-            $conversation->setIsChannelPublic(false);
-            $conversation->setDeleted(false);
+            $roleHelper = $this->get('app_role_helper');
+            $roleHierarchy = $roleHelper->getParentRoles('ROLE_MODERATOR');
 
-            $this->getUser()->addConversation($conversation);
-            foreach($selectedUsers as $user)
-            {
-                $user->addConversation($conversation);
-                $entityManager->persist($user);
-            }
-
-            $entityManager->persist($conversation);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_dashboard');
+            $additionalUsersToAdd = $userRepository->findByRole($roleHierarchy, $users);
+            $users = array_merge($users, $additionalUsersToAdd);
+        }
+        else 
+        {
+            $channelIsPrivate = false;
+            $users = $userRepository->findAll();
         }
 
-        return $this->render('page/new_conversation.html.twig', [
-            'conversationForm' => $form->createView()
-        ]);
+        if(!empty($users) && is_array($users))
+        {
+            //@todo conversationHandler->createNewConversation();
+            $conversation = new Conversation();
+            $conversation->setChannelName($channelName);
+            $conversation->setCreatedBy($this->getUser());
+            $conversation->setIsChannel(true);
+            $conversation->setIsChannelPublic(!$channelIsPrivate);
+            $conversation->setDeleted(false);
+
+            foreach($users as $user)
+            {
+                $user->addConversation($conversation);
+                $em->persist($user);
+            }
+
+            $em->persist($conversation);
+            $em->flush();
+        }
+
+        return new Response();
     }
 
     /**
@@ -74,9 +86,14 @@ class ConversationController extends Controller
         $messageHandler = $this->get('app_message_handler');
         $messageBlocks = $messageHandler->getConversationMessages($conversation);
 
+        $em = $this->get('doctrine')->getManager();
+        $userRepository = $em->getRepository(User::class);
+        $users = $userRepository->findAll();
+        
         return $this->render('page/conversation.html.twig', [
             'messages' => $messageBlocks,
-            'conversations' => $sortedConversations
+            'conversations' => $sortedConversations,
+            'users' => $users
         ]);
     }
 }

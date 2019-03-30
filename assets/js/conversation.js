@@ -3,10 +3,66 @@ require('./app.js');
 import Tagify from '@yaireo/tagify';
 import qq from 'fine-uploader';
 import Offline from 'offline-js';
-
+import Selectize from 'selectize';
+import SelectizeTheme from 'selectize/dist/css/selectize.default.css';
 import defaultTheme from 'offline-js/themes/offline-theme-default.css';
 import defaultThemeLang from 'offline-js/themes/offline-language-english.css';
-import Toastify from 'toastify-js'
+import Toastify from 'toastify-js';
+
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
+$(document).on("click", "#create-channel", function(event) {
+    event.preventDefault();
+
+    var channelData = $("#form-channel").serializeObject();
+
+    $.ajax({
+        url: '/channel/new',
+        type: 'POST',
+        data: channelData,
+        complete: function(data) 
+        {
+            $("#create-channel").trigger('reset');
+        }
+    });
+});
+
+$('#channelUsers').selectize({
+    delimiter: ',',
+    persist: false,
+    create: false,
+    valueField: 'username',
+    labelField: 'name',
+    searchField: ['name', 'username'],
+    options: clients
+});
+
+$(document).on("change", "#channelIsPrivate", function(event) {
+    event.preventDefault();
+    if($(this).is(":checked")) 
+    {
+        $('#xif-private_channel').show();
+    }
+    else 
+    {
+        $('#xif-private_channel').hide();
+    }
+});
 
 $(document).on("click", "#file-picker", function(event) {
     event.preventDefault();

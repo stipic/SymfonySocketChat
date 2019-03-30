@@ -44,4 +44,53 @@ class UserRepository extends ServiceEntityRepository
 
         return $stmt->fetchAll();
     }
+
+    public function findByRole(array $roles, array $exludeUsers = array())
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $roleif = ''; 
+        $i = 0;
+        $roleParams = [];
+        foreach($roles as $role)
+        {
+            $roleParams['role_' . $i] = $role;
+            $roleif .= ($i != 0 ? ' OR ' : '') . 'g.role=:role_' . $i . '';
+
+            $i ++;
+        }
+
+        $userIf = '';
+        $i = 0;
+        foreach($exludeUsers as $singleUser)
+        {
+            $roleParams['user_exclude_' . $i] = $singleUser->getId();
+            $userIf .= ($i != 0 ? ' AND ' : '') . 'u.id!=:user_exclude_' . $i . '';
+
+            $i ++;
+        }
+
+        $sql = '
+        SELECT 
+            u.*
+        FROM groups as g
+        INNER JOIN 
+            user_group as ug ON ug.group_id=g.id ' . (!empty($roleif) ? "AND (" . $roleif . ")" : "") .
+        'INNER JOIN
+            users as u ON u.id=ug.user_id '. (!empty($userIf) ? "AND (" . $userIf . ")" : "");
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute($roleParams);
+
+        $userIds = [];
+        $usersWithAccessToRole = $stmt->fetchAll();
+        foreach($usersWithAccessToRole as $user)
+        {
+            $userIds[] = $user['id'];
+        }
+
+        return $this->findBy([
+            'id' => $userIds
+        ]);
+    }
 }

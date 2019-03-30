@@ -144,6 +144,11 @@
         </div>
     </script>
     <script type="text/javascript">
+        var clients = [
+            {% for user in users %}
+                {username: "{{ user.username }}", name: "{{ user.displayName }}"},
+            {% endfor %}
+        ];
         var clientInformation = {
             username: '{{ app.user.username }}',
             wsConversationRoute: 'conversation/{{ conversations.current.id }}',

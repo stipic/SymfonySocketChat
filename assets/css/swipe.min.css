@@ -2898,3 +2898,7 @@ outline:none;
 .qq-uploader {
 	display: none !important;
 }
+
+#xif-private_channel {
+	display: none;
+}

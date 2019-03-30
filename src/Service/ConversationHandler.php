@@ -123,4 +123,9 @@ class ConversationHandler
         return 0;
     }
 
+    public function createNewConversation()
+    {
+        //@todo
+    }
+
 }

@@ -90,3 +90,9 @@ services:
         arguments: ['@gos_web_socket.websocket.client_manipulator', "@doctrine.orm.entity_manager"]
         tags:
             - { name: gos_web_socket.topic }
+
+    app_role_helper:
+        public: true
+        class: App\Security\RoleHelper
+        bind:
+            $roleHierarchy: '%security.role_hierarchy.roles%'
