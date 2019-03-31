@@ -25,7 +25,7 @@ class ConversationHandler
     {
         $this->_router = $router;
         $this->_em = $em;
-        $this->_validator = Validation::createValidator();        ;
+        $this->_validator = Validation::createValidator();
         $this->_zmqPusher = $zmqPusher;
         $this->_twig = $twig;
     }
