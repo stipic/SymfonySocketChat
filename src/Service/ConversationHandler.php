@@ -7,6 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Component\Validator\Validation;
 
 class ConversationHandler
 {
@@ -20,11 +21,11 @@ class ConversationHandler
 
     private $_twig;
 
-    public function __construct(Router $router, ObjectManager $em, ValidatorInterface $validator, $zmqPusher, TwigEngine $twig)
+    public function __construct(Router $router, ObjectManager $em, $zmqPusher, TwigEngine $twig)
     {
         $this->_router = $router;
         $this->_em = $em;
-        $this->_validator = $validator;
+        $this->_validator = Validation::createValidator();        ;
         $this->_zmqPusher = $zmqPusher;
         $this->_twig = $twig;
     }
