@@ -10,16 +10,27 @@ use App\Entity\Conversation;
 use App\Form\ConversationFormType;
 use App\Service\ConversationHandler;
 use App\Entity\User;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ConversationController extends Controller
 {
     /**
-     * @Route("/channel/new", name="app_new_channel", condition="request.isXmlHttpRequest()")
+     * @Route("/channel/new/{id}", name="app_new_channel", condition="request.isXmlHttpRequest()")
      * @Method({"POST"})
      */
-    public function newChannel(Request $request)
+    public function newChannel(Conversation $currentConversation, Request $request)
     {
         $this->denyAccessUnlessGranted('ROLE_MODERATOR');
+
+        $response = [
+            'success' => false,
+            'status' => 200,
+            'data' => [
+                'message' => 'Failed',
+                'errors' => [],
+            ]
+        ];
 
         $em = $this->get('doctrine')->getManager();
         $userRepository = $em->getRepository(User::class);
@@ -51,25 +62,20 @@ class ConversationController extends Controller
 
         if(!empty($users) && is_array($users))
         {
-            //@todo conversationHandler->createNewConversation();
-            $conversation = new Conversation();
-            $conversation->setChannelName($channelName);
-            $conversation->setCreatedBy($this->getUser());
-            $conversation->setIsChannel(true);
-            $conversation->setIsChannelPublic(!$channelIsPrivate);
-            $conversation->setDeleted(false);
-
-            foreach($users as $user)
-            {
-                $user->addConversation($conversation);
-                $em->persist($user);
-            }
-
-            $em->persist($conversation);
-            $em->flush();
+            $conversationHandler = $this->get('app_conversation_handler');
+            list($response['success'], $response['data']['errors']) = $conversationHandler->createNewConversation(
+                $channelName,
+                $this->getUser(),
+                true,
+                !$channelIsPrivate,
+                false,
+                $users,
+                $currentConversation
+            );
+            
         }
 
-        return new Response();
+        return new JsonResponse($response);
     }
 
     /**

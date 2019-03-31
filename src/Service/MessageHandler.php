@@ -4,7 +4,7 @@ use App\Entity\Conversation;
 use App\Entity\Message;
 use App\Entity\MessageBlock;
 use App\Entity\User;
-
+use Symfony\Bundle\TwigBundle\TwigEngine;
 use Doctrine\Common\Persistence\ObjectManager;
 
 class MessageHandler 
@@ -15,7 +15,7 @@ class MessageHandler
 
     private $_twig;
     
-    public function __construct(ObjectManager $em, $pusher, $twig) 
+    public function __construct(ObjectManager $em, $pusher, TwigEngine $twig) 
     {
         $this->_em = $em;
         $this->_zmqPusher = $pusher;

@@ -10,6 +10,7 @@ use ApiPlatform\Core\Serializer\Filter\GroupFilter;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\User;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @ORM\Entity
@@ -77,6 +78,10 @@ class Conversation
      * 
      * KOD JAVNIH KANALA, NARAVNO, naziv je !!OBAVEZAN!!
      * 
+     * @Assert\Expression(
+     *     "this.getIsChannel() == true and this.isChannelNameSafe(value)",
+     *     message="Channel name must be at least 3 characters long and cannot be longer than 10 characters."
+     * )
      * @ORM\Column(type="string", length=255, options={"default": ""}, nullable=true)
      */
     private $channelName;
@@ -135,6 +140,16 @@ class Conversation
     {
         $this->messageBlocks = new ArrayCollection();
         $this->users = new ArrayCollection();
+    }
+
+    public function isChannelNameSafe($value)
+    {
+        if(strlen($value) > 2 && strlen($value) < 10)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**

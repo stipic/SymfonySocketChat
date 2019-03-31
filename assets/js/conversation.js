@@ -32,12 +32,21 @@ $(document).on("click", "#create-channel", function(event) {
     var channelData = $("#form-channel").serializeObject();
 
     $.ajax({
-        url: '/channel/new',
+        url: '/channel/new/' + clientInformation.conversationId,
         type: 'POST',
         data: channelData,
         complete: function(data) 
         {
-            $("#create-channel").trigger('reset');
+            if(data.responseJSON.success == true)
+            {
+                // cool smo!
+                $("#create-channel").trigger('reset');
+                $('#new-channel').modal('hide');
+            }
+            else 
+            {
+                // error msgs.
+            }
         }
     });
 });
@@ -141,7 +150,6 @@ function main()
             },
             appendMessageChunk: function(messageHtml)
             {
-                console.log('CHUNK #1');
                 $('#org-msg-zone .message:last').find('.text').append(messageHtml);
 
                 scrollToBottom(document.getElementById('content'));
@@ -373,19 +381,38 @@ function main()
 
         session.subscribe('unreaded/' + clientInformation.username , function (uri, payload) {
 
-            console.log('unreaded: ', payload);
             var responsePayload = JSON.parse(payload);
-            for(var key in responsePayload)
+            if(responsePayload.type !== undefined && responsePayload.type == 'sidebar')
             {
-                if(responsePayload.hasOwnProperty(key))
-                {
-                    var injectVal = '';
-                    if(responsePayload[key] > 0)
-                    {
-                        injectVal = responsePayload[key];
-                    }
+                console.log('sidebar update: ', responsePayload);
+                $('#discussions .discussions').remove();
+                $('#discussions').append(responsePayload.template);
 
-                    $("li[data-cid='" + key + "'] .user-nickname span:last").html(injectVal);
+                $('.discussions li').removeClass('active');
+                $('.discussions li').each(function() {
+                    var cid = $(this).attr('data-cid');
+                    if(cid == clientInformation.conversationId) {
+                        $(this).addClass('active');
+                    }
+                });
+
+                session.publish('online', '');
+            }
+            else 
+            {
+                console.log('unreaded: ', responsePayload);
+                for(var key in responsePayload)
+                {
+                    if(responsePayload.hasOwnProperty(key))
+                    {
+                        var injectVal = '';
+                        if(responsePayload[key] > 0)
+                        {
+                            injectVal = responsePayload[key];
+                        }
+
+                        $("li[data-cid='" + key + "'] .user-nickname span:last").html(injectVal);
+                    }
                 }
             }
         });

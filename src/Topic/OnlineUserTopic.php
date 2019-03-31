@@ -43,6 +43,8 @@ class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
      */
     public function onPublish(ConnectionInterface $connection, Topic $topic, WampRequest $request, $event, array $exclude, array $eligible)
     {
+        $eligible = [$connection->WAMP->sessionId];
+        $topic->broadcast(json_encode($this->_onlineUsers), [], $eligible);
     }
 
     /**

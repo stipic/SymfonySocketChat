@@ -82,7 +82,7 @@ services:
 
     app_conversation_handler:
         class: App\Service\ConversationHandler
-        arguments: ["@router", "@doctrine.orm.entity_manager"]
+        arguments: ["@router", "@doctrine.orm.entity_manager", "@debug.validator", "@gos_web_socket.zmq.pusher", "@templating"]
         public: true
 
     app_user_unread_message_socket:

@@ -27,7 +27,12 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
     {
         if($connection !== null)
         {
-            if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User) 
+            $pubSubRouteChunk = explode('/', $topic->getId());
+            if(
+                !$this->clientManipulator->getClient($connection) instanceof \App\Entity\User ||
+                !isset($pubSubRouteChunk[1]) || // username
+                $pubSubRouteChunk[1] != $this->clientManipulator->getClient($connection)->getUsername()
+            ) 
             {
                 throw new FirewallRejectionException();
             }
@@ -36,17 +41,28 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
         {
             // ZmqPusher
         }
-
-        //@todo provjeri dali je ID usera jednak ID-u ovog topic-a
     }
 
     public function onPush(Topic $topic, $request, $payload, $provider)
     {
-        $userId = $payload['userId'];
-        $conversationId = $payload['conversationId'];
-        $unreadedNotif = $this->getConversationNotificationArr($userId, $conversationId);
+        $responsePayload = '';
+        if(isset($payload['userId']))
+        {
+            // UNREAD NOTIFICATION
+            $userId = $payload['userId'];
+            $conversationId = $payload['conversationId'];
+            $responsePayload = $this->getConversationNotificationArr($userId, $conversationId);
+        }
+        else 
+        {
+            // REBUILD SIDEBAR
+            $responsePayload = [
+                'type' => 'sidebar',
+                'template' => $payload
+            ];
+        }
 
-        $topic->broadcast(json_encode($unreadedNotif));
+        $topic->broadcast(json_encode($responsePayload));
     }
 
     /**

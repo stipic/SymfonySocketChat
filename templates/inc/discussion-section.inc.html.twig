@@ -1,0 +1,32 @@
+<div class="discussions">
+    <h1>
+        Channels
+        {% if is_granted('ROLE_MODERATOR') %}
+            <button class="btn" data-toggle="modal" data-target="#new-channel"><i class="material-icons">add_circle_outline</i></button>
+        {% endif %}
+    </h1>
+    
+    <ul>
+        {% for c in conversations.channels %}
+
+            {% include 'inc/conversation-item.inc.html.twig' %}
+        
+        {% endfor %}
+    </ul>
+</div>		
+<div class="discussions">
+    <h1>
+        Conversations
+        {% if is_granted('ROLE_MODERATOR') %}
+            <button class="btn" data-toggle="modal" data-target="#new-conversation"><i class="material-icons">add_circle_outline</i></button>
+        {% endif %}
+    </h1>
+    <ul>
+        {% for c in conversations.direct %}
+
+                {% include 'inc/conversation-item.inc.html.twig' %}
+        
+        {% endfor %}
+
+    </ul>
+</div>

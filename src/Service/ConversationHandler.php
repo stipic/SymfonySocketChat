@@ -5,6 +5,8 @@ use App\Entity\Conversation;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\TwigBundle\TwigEngine;
 
 class ConversationHandler
 {
@@ -12,10 +14,19 @@ class ConversationHandler
 
     private $_em;
 
-    public function __construct(Router $router, ObjectManager $em)
+    private $_validator;
+
+    private $_zmqPusher;
+
+    private $_twig;
+
+    public function __construct(Router $router, ObjectManager $em, ValidatorInterface $validator, $zmqPusher, TwigEngine $twig)
     {
         $this->_router = $router;
         $this->_em = $em;
+        $this->_validator = $validator;
+        $this->_zmqPusher = $zmqPusher;
+        $this->_twig = $twig;
     }
 
     public function getUserConversations(User $user, Conversation $currentConversation)
@@ -123,9 +134,60 @@ class ConversationHandler
         return 0;
     }
 
-    public function createNewConversation()
+    public function createNewConversation(
+        string $channelName,
+        User $author,
+        bool $isChannel,
+        bool $isChannelPublic,
+        bool $isDeleted,
+        $usersToAddInConversation,
+        Conversation $currentConversation
+    ) : array
     {
-        //@todo
+        $responseErrors = [];
+        $responseSuccess = false;
+
+        $conversation = new Conversation();
+        $conversation->setChannelName($channelName);
+        $conversation->setCreatedBy($author);
+        $conversation->setIsChannel($isChannel);
+        $conversation->setIsChannelPublic($isChannelPublic);
+        $conversation->setDeleted($isDeleted);
+
+        $errors = $this->_validator->validate($conversation);
+
+        if(count($errors) == 0)
+        {
+            foreach($usersToAddInConversation as $user)
+            {
+                $user->addConversation($conversation);
+                $this->_em->persist($user);
+            }
+
+            $this->_em->persist($conversation);
+            $this->_em->flush();
+
+            // nakon sto je flushano, mogu pushati svima njima novi sidebar
+            foreach($usersToAddInConversation as $user)
+            {
+                $sortedConversations = $this->getUserConversations($user, $currentConversation);
+                $receiverPayload = $this->_twig->render('inc/discussion-section.inc.html.twig', array(
+                    'conversations' => $sortedConversations,
+                ));
+                $this->_zmqPusher->push($receiverPayload, 'app_unread_messages', ['username' => $user->getUsername()]);
+            }
+
+            $responseSuccess = true;
+        }
+        else 
+        {
+            foreach($errors as $violation) 
+            {
+                $responseErrors[$violation->getPropertyPath()] = $violation->getMessage();
+            }
+        }
+
+        return [$responseSuccess, $responseErrors];
     }
 
 }
