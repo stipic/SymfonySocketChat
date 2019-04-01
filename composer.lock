@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "50430bb77a8a5eb26266d1690e13a16c",
+    "content-hash": "a241e3037a0041a159e6391a20feb19c",
     "packages": [
         {
             "name": "behat/transliterator",
@@ -1878,6 +1878,54 @@
                 "url"
             ],
             "time": "2018-12-04T20:46:45+00:00"
+        },
+        {
+            "name": "jbbcode/jbbcode",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jbowens/jBBCode.git",
+                "reference": "740092873a687e61b980d2a094f6323b0d3b273c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jbowens/jBBCode/zipball/740092873a687e61b980d2a094f6323b0d3b273c",
+                "reference": "740092873a687e61b980d2a094f6323b0d3b273c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.1",
+                "phpunit/phpunit": "4.5.*",
+                "satooshi/php-coveralls": "0.6.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "JBBCode": "."
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jackson Owens",
+                    "email": "jackson_owens@alumni.brown.edu",
+                    "homepage": "http://jbowens.org/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A lightweight but extensible BBCode parser written in PHP 5.3.",
+            "homepage": "http://jbbcode.com/",
+            "keywords": [
+                "BB",
+                "bbcode"
+            ],
+            "time": "2019-02-22T23:54:11+00:00"
         },
         {
             "name": "jdorn/sql-formatter",

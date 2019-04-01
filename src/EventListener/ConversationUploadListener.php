@@ -42,9 +42,42 @@ class ConversationUploadListener
         $path = '/' . $this->_params->get('storage_dir') . '/' . $event->getFile()->getPathname();
         $filename = $file->getClientOriginalName();
         $mimeType = $event->getFile()->getMimeType();
-        $filesize = $event->getRequest()->server->get('CONTENT_LENGTH');
 
-        $content = '<img width="100" src="' . $path . '" />';
+        $mimeTypeBBC = '';
+        switch($mimeType)
+        {
+            // Pictures
+            case 'image/jpeg':
+            case 'image/png': 
+            case 'image/gif':
+            case 'image/jpeg': 
+            case 'image/svg+xml':
+            case 'image/webp':
+            {
+                $mimeTypeBBC = '[img]' . $path . '[/img]';
+            }
+            
+            // Audio
+            case 'audio/mp3': 
+            case 'audio/mpeg': 
+            {
+                $mimeTypeBBC = '[audio]' . $path . '[/audio]';
+            }
+
+            // Video
+            case 'video/mp4': 
+            {
+                $mimeTypeBBC = '[video]' . $path . '[/video]';
+            }
+
+            // Other, files:
+            default:
+            {
+                $mimeTypeBBC = '[file]' . $path . '[/file]';
+            }
+        }
+
+        $filesize = $event->getRequest()->server->get('CONTENT_LENGTH');
         
         $file = new File();
         $file->setName($filename);
@@ -57,7 +90,7 @@ class ConversationUploadListener
 
         // Create new Message!
 
-        $this->_messageHandler->insertMessage($content, $this->_conversation, array(
+        $this->_messageHandler->insertMessage($mimeTypeBBC, $this->_conversation, array(
             'files' => [
                 $file
             ],

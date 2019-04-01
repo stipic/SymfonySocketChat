@@ -2902,3 +2902,7 @@ outline:none;
 #xif-private_channel {
 	display: none;
 }
+
+img.img-pic {
+	max-width: 600px;
+}

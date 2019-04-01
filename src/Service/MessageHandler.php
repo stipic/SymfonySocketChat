@@ -33,6 +33,7 @@ class MessageHandler
         if(!empty($msg) && strlen($msg) > 0)
         {
             $msg = trim($msg);
+            $msg = htmlspecialchars($msg, ENT_QUOTES);
             $user = $params['createdBy'];
 
             $message = new Message();

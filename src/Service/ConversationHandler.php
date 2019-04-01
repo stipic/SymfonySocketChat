@@ -148,6 +148,9 @@ class ConversationHandler
         $responseErrors = [];
         $responseSuccess = false;
 
+        $channelName = trim($channelName);
+        $channelName = htmlspecialchars($channelName, ENT_QUOTES);
+
         $conversation = new Conversation();
         $conversation->setChannelName($channelName);
         $conversation->setCreatedBy($author);

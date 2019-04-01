@@ -144,6 +144,9 @@
     "guzzlehttp/psr7": {
         "version": "1.5.2"
     },
+    "jbbcode/jbbcode": {
+        "version": "v1.4.0"
+    },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
     },

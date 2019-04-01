@@ -96,3 +96,10 @@ services:
         class: App\Security\RoleHelper
         bind:
             $roleHierarchy: '%security.role_hierarchy.roles%'
+    
+    app.message_parser:
+        public: true
+        class: App\EventListener\MessageParserListener
+        arguments: ['@templating']
+        tags:
+            - { name: doctrine.event_listener, event: postLoad }
