@@ -41,8 +41,7 @@ class MessageHandler
             {
                 $msg = htmlspecialchars($msg, ENT_QUOTES);
             }
-            $msg = $this->_messageParser->parse($msg);
-            
+
             $user = $params['createdBy'];
 
             $message = new Message();
@@ -50,13 +49,22 @@ class MessageHandler
             $message->setCreatedBy($user);
             $message->setDeleted(false);
 
-            if(isset($params['files']))
+            $file = [
+                'name' => '',
+                'size' => '',
+            ];
+
+            if(isset($params['file']))
             {
-                foreach($params['files'] as $messageFile)
-                {
-                    $message->addFileToMessage($messageFile);
-                }
+                $file = [
+                    'name' => $params['file']->getName(),
+                    'size' => $params['file']->getFileSize(),
+                ];
+                $message->setFile($params['file']);
             }
+
+            $parsedMessage = $this->_messageParser->parse($msg, $file);
+            $message->setParsedContent($parsedMessage);
 
             $messageBlock = $this->_isNewMessageChunk($conversation, $user);            
             if($messageBlock instanceof MessageBlock)

@@ -101,9 +101,7 @@ class ConversationUploadListener
         // Create new Message!
 
         $this->_messageHandler->insertMessage($mimeTypeBBC, $this->_conversation, array(
-            'files' => [
-                $file
-            ],
+            'file' => $file,
             'createdBy' => $user,
             'ignoreXss' => true
         ));

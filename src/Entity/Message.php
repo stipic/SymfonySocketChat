@@ -47,12 +47,6 @@ class Message
     private $createdBy;
 
     /**
-     * @var array $files
-     * @ORM\OneToMany(targetEntity="File", mappedBy="message")
-     */
-    private $files;
-
-    /**
      * @var string $updatedBy
      *
      * @Gedmo\Blameable(on="update")
@@ -78,9 +72,18 @@ class Message
      */
     private $unreadedBy;
 
+    /**
+     * @var string $parsedContent
+     */
+    private $parsedContent;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\File", inversedBy="message", cascade={"persist", "remove"})
+     */
+    private $file;
+
     public function __construct()
     {
-        $this->files = new ArrayCollection();
         $this->unreadedBy = new ArrayCollection();
     }
 
@@ -256,25 +259,50 @@ class Message
     }
 
     /**
-     * Get the value of messages
-     */ 
-    public function getFiles()
-    {
-        return $this->files;
-    }
-
-    public function addFileToMessage(\App\Entity\File $file)
-    {
-        $this->files->add($file);
-
-        return $this->files;
-    }
-
-    /**
      * @ORM\PrePersist
      */
     public function prePersistSetCreatedAt()
     {
         $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * Get $parsedContent
+     *
+     * @return  string
+     */ 
+    public function getParsedContent()
+    {
+        if(empty($this->parsedContent))
+        {
+            return $this->content;
+        }
+        return $this->parsedContent;
+    }
+
+    /**
+     * Set $parsedContent
+     *
+     * @param  string  $parsedContent  $parsedContent
+     *
+     * @return  self
+     */ 
+    public function setParsedContent(string $parsedContent)
+    {
+        $this->parsedContent = $parsedContent;
+
+        return $this;
+    }
+
+    public function getFile(): ?File
+    {
+        return $this->file;
+    }
+
+    public function setFile(?File $file): self
+    {
+        $this->file = $file;
+
+        return $this;
     }
 }

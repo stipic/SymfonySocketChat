@@ -38,8 +38,7 @@ class File
     private $fileSize;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Message", inversedBy="files")
-     * @ORM\JoinColumn(name="message", referencedColumnName="id")
+     * @ORM\OneToOne(targetEntity="App\Entity\Message", mappedBy="file", cascade={"persist", "remove"})
      */
     private $message;
 
@@ -143,11 +142,21 @@ class File
         return $this;
     }
 
-    /**
-     * Get the value of message
-     */ 
-    public function getMessage()
+    public function getMessage(): ?Message
     {
         return $this->message;
+    }
+
+    public function setMessage(?Message $message): self
+    {
+        $this->message = $message;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newFile = $message === null ? null : $this;
+        if ($newFile !== $message->getFile()) {
+            $message->setFile($newFile);
+        }
+
+        return $this;
     }
 }
