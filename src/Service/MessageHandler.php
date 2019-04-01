@@ -6,6 +6,7 @@ use App\Entity\MessageBlock;
 use App\Entity\User;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Doctrine\Common\Persistence\ObjectManager;
+use App\EventListener\MessageParserListener;
 
 class MessageHandler 
 {
@@ -15,11 +16,14 @@ class MessageHandler
 
     private $_twig;
     
-    public function __construct(ObjectManager $em, $pusher, TwigEngine $twig) 
+    private $_messageParser;
+
+    public function __construct(ObjectManager $em, $pusher, TwigEngine $twig, MessageParserListener $messageParser) 
     {
         $this->_em = $em;
         $this->_zmqPusher = $pusher;
         $this->_twig = $twig;
+        $this->_messageParser = $messageParser;
     }
 
     public function getConversationMessages(Conversation $conversation) 
@@ -33,7 +37,12 @@ class MessageHandler
         if(!empty($msg) && strlen($msg) > 0)
         {
             $msg = trim($msg);
-            $msg = htmlspecialchars($msg, ENT_QUOTES);
+            if(!isset($params['ignoreXss']))
+            {
+                $msg = htmlspecialchars($msg, ENT_QUOTES);
+            }
+            $msg = $this->_messageParser->parse($msg);
+            
             $user = $params['createdBy'];
 
             $message = new Message();

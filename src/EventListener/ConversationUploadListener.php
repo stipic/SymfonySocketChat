@@ -26,7 +26,13 @@ class ConversationUploadListener
 
     private $_messageHandler;
 
-    public function __construct(ObjectManager $em, AuthorizationChecker $authChecker, TokenStorageInterface $token, ParameterBagInterface $params, MessageHandler $messageHandler)
+    public function __construct(
+        ObjectManager $em, 
+        AuthorizationChecker $authChecker, 
+        TokenStorageInterface $token, 
+        ParameterBagInterface $params, 
+        MessageHandler $messageHandler
+    )
     {
         $this->_em = $em;
         $this->_authChecker = $authChecker;
@@ -55,6 +61,7 @@ class ConversationUploadListener
             case 'image/webp':
             {
                 $mimeTypeBBC = '[img]' . $path . '[/img]';
+                break;
             }
             
             // Audio
@@ -62,18 +69,21 @@ class ConversationUploadListener
             case 'audio/mpeg': 
             {
                 $mimeTypeBBC = '[audio]' . $path . '[/audio]';
+                break;
             }
 
             // Video
             case 'video/mp4': 
             {
                 $mimeTypeBBC = '[video]' . $path . '[/video]';
+                break;
             }
 
             // Other, files:
             default:
             {
                 $mimeTypeBBC = '[file]' . $path . '[/file]';
+                break;
             }
         }
 
@@ -94,7 +104,8 @@ class ConversationUploadListener
             'files' => [
                 $file
             ],
-            'createdBy' => $user
+            'createdBy' => $user,
+            'ignoreXss' => true
         ));
     }
 
