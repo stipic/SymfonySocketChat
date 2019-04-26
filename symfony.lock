@@ -117,11 +117,23 @@
     "egulias/email-validator": {
         "version": "2.1.7"
     },
+    "essence/dom": {
+        "version": "1.0.0"
+    },
+    "essence/essence": {
+        "version": "3.5.2"
+    },
+    "essence/http": {
+        "version": "1.0.0"
+    },
     "evenement/evenement": {
         "version": "v3.0.1"
     },
     "facebook/webdriver": {
         "version": "1.6.0"
+    },
+    "fg/parkour": {
+        "version": "1.1.1"
     },
     "fig/link-util": {
         "version": "1.0.0"

@@ -22,9 +22,58 @@ class MessageParserListener
     public function parse(string $content, array $fileInfo) : string
     {
         $this->_fileInfo = $fileInfo;
+
+        $content = $this->parseUrls($content); // ovo drzati na vrhu, posto parsa i kreira mozda bbc koji ce onda multimedia dodatno sparsati
         
         $content = $this->parseMultimedia($content);
 
+        return $content;
+    }
+
+    public function parseUrls(string &$content)
+    {
+        // extract ALL urls from string.
+        preg_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $content, $urls);
+
+        $urls = isset($urls[0]) ? $urls[0] : [];
+        if(!empty($urls))
+        {
+            $essence = new \Essence\Essence();
+
+            //@todo keširanje već pasiranog bi bilo super.
+
+            foreach($urls as $singleUrl)
+            {
+                $aHref = '<a href="' . $singleUrl . '" target="_blank">' . $singleUrl . '</a>';
+                $content = str_replace($singleUrl, $aHref, $content);
+                $media = $essence->extract($singleUrl);
+
+                if($media)
+                {
+                    $provider = $media->provider_url;
+                    $thumb = isset($media->thumbnailUrl) ? $media->thumbnailUrl : $media->thumbnail_url;
+
+                    if(isset($media->html))
+                    {
+                        $content .= '<br />' . $media->html;
+                    }
+                    else 
+                    {
+                        $content .= '<br />' . $thumb;
+                    }
+                }
+                else 
+                {
+                    // ajmo dohvatiti barem osnovno sto nam HTTP header-i nude.
+                    $tags = get_meta_tags($singleUrl);
+                    if(!empty($tags))
+                    {
+                        $template = $this->_twig->render('message-blocks/base-url.inc.html.twig', $tags);
+                        $content .= '<br />' . $template;
+                    }
+                }
+            }
+        }
         return $content;
     }
 
@@ -93,7 +142,6 @@ class MessageParserListener
                 method_exists($entity, 'getContent') &&
                 method_exists($entity, 'setParsedContent')) 
             {
-                //@todo napraviti relaciju message i files entiteta kako bi mogao dohvatiti informacije o uploadanom file-u
                 $file = [
                     'name' => '',
                     'size' => ''
@@ -107,7 +155,10 @@ class MessageParserListener
                     ];
                 }
 
-                $entity->setParsedContent($this->parse($entity->getContent(), $file));
+                $parsedContent = $this->parse($entity->getContent(), $file);
+                $entity->setParsedContent($parsedContent);
+                
+                //@todo ajmo oznaciti da je ova poruka parsirana i da je ne parsiramo uvijek iznova?
             }
         }
     }
