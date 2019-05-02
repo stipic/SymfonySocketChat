@@ -41,7 +41,7 @@ class MessageController extends Controller
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
         $messageHandler = $this->get('app_message_handler');
-        $sortedMessages = $messageHandler->getConversationMessages($conversation);
+        $sortedMessages = $messageHandler->getMessageBlocks($conversation);
 
         // update unreaded messages.
 
@@ -49,5 +49,20 @@ class MessageController extends Controller
             'messages' => $sortedMessages,
             'conversations' => $sortedConversations,
         ));
+    }
+
+    /**
+     * @Route("/message/{id}/from/{startOffset}", name="app_conversation_messages_by_offset", condition="request.isXmlHttpRequest()")
+     * @Method({"GET"})
+     */
+    public function getMessageBlocksByOffset(Conversation $conversation, int $startOffset, Request $request)
+    {
+        $this->denyAccessUnlessGranted('access', $conversation);
+
+        $messageHandler = $this->get('app_message_handler');
+        $sortedMessages = $messageHandler->getMessageBlocks($conversation, $startOffset);
+
+        //@todo render msgs & return
+        return [];//@todo
     }
 }

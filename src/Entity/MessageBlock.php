@@ -14,6 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @ORM\Entity
  * @ORM\Table(name="message_blocks")
  * @ORM\HasLifecycleCallbacks()
+* @ORM\Entity(repositoryClass="App\Repository\MessageBlockRepository")
  */
 class MessageBlock
 {

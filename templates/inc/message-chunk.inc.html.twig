@@ -1,1 +1,1 @@
-<p data-toggle="tooltip" data-placement="left" data-original-title="{{ messageChunk.getCreatedAt|date('d.m.Y - H:i:s')}}">{{ messageChunk.parsedContent | raw }}</p>
+<p data-toggle="tooltip" data-placement="left" data-msg-id="{{ messageChunk.id }}" data-original-title="{{ messageChunk.getCreatedAt|date('d.m.Y - H:i:s')}}">{{ messageChunk.parsedContent | raw }}</p>

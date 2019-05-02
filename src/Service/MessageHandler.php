@@ -25,11 +25,33 @@ class MessageHandler
         $this->_twig = $twig;
         $this->_messageParser = $messageParser;
     }
-
-    public function getConversationMessages(Conversation $conversation) 
+    
+    /**
+     *
+     * @param Conversation $conversation
+     * @param integer $start | -1 = dohvati zadnjih $limit blokova.
+     * @param integer $limit
+     * @return void
+     */
+    public function getMessageBlocks(Conversation $conversation, $start = -1, $limit = 40)
     {
-        $conversationMessages = $conversation->getMessageBlocks()->getValues();
-        return $conversationMessages;
+        //@todo napraviti da u jedan msg block ne moze biti vise od 30 poruka tj. ovisi o contentu.
+        // limit na content po msg bloku napraviti.
+
+        $orderBy = null;
+        if($start == -1)
+        {
+            $orderBy = ['id' => 'DESC'];
+            $start = null;
+        }
+
+        $msgBlockRepo = $this->_em->getRepository(MessageBlock::class);
+        return $msgBlockRepo->findBy(
+            ['conversation' => $conversation],
+            $orderBy, // orderBy
+            $limit,
+            $start
+        )->getValues();
     }
 
     public function insertMessage($msg, Conversation $conversation, $params = array())

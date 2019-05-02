@@ -90,7 +90,7 @@ class ConversationController extends Controller
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
         $messageHandler = $this->get('app_message_handler');
-        $messageBlocks = $messageHandler->getConversationMessages($conversation);
+        $messageBlocks = $messageHandler->getMessageBlocks($conversation);
 
         $em = $this->get('doctrine')->getManager();
         $userRepository = $em->getRepository(User::class);
