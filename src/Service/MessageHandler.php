@@ -147,6 +147,10 @@ class MessageHandler
      * dali je user koji upravo objavljuje poruku vlasnik zadnjeg bloka, ukoliko JE
      * provjerava dali je zadnji "updatedAt" (vrijeme kada je zadnja poruka injectana u blok) u intervalu 
      * od 5 minuta, ukoliko i to je onda je nova poruka CHUNK i vracamo $messageBlok objekt u suprotnom vracamo false
+     *
+     * @param Conversation $conversation
+     * @param User $user
+     * @return false|MessageBlock $lastMessageBlockInConversation
      */
     private function _isNewMessageChunk(Conversation $conversation, User $user)
     {
@@ -166,6 +170,7 @@ class MessageHandler
                 }
                 else 
                 {
+                    //@todo fix, krivo uspoređuje.
                     $diff = (new \DateTime())->diff($lastMessageBlockInConversation->getUpdatedAt());
                     if($diff->y == 0 && $diff->m == 0 && $diff->d == 0 && $diff->h == 0 && $diff->i < 5)
                     {
