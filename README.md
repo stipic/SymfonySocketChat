@@ -1,3 +1,6 @@
+@todo ADMIN
+_____________
+
 1. Sonata Admin Bundle
 2. Kreiranje / Uređivanje / Brisanje usera, konverzacija, poruka (front and back)
 3. Postavke sustava:
@@ -20,3 +23,10 @@
 8. Nexmo integracija za SMS notifikacije i postavke
 9. Import slack kanala / poruka i user-a
 10. Multilanguage support
+
+@todo GENERAL
+__________________
+
+1. Dokumentacija
+2. Installation script koja provjerava dali system (server) ima sve (extenzije, module i sl.) što je potrebno za pokrenuti chat
+3. Presentation video, landing page, demo mode (neki featurei su disableani u ovom mode-u, i kada je DEMO upaljen treba stajati info da useri znaju da neki featurei nece raditi)
