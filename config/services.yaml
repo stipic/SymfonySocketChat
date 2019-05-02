@@ -103,3 +103,9 @@ services:
         arguments: ['@templating']
         tags:
             - { name: doctrine.event_listener, event: postLoad }
+
+    admin.user:
+        class: App\Admin\UserAdmin
+        arguments: [~, App\Entity\User, ~]
+        tags:
+            - { name: sonata.admin, manager_type: orm, group: 'Content', label: 'User' }

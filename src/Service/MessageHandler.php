@@ -33,15 +33,14 @@ class MessageHandler
      * @param integer $limit
      * @return void
      */
-    public function getMessageBlocks(Conversation $conversation, $start = -1, $limit = 40)
+    public function getMessageBlocks(Conversation $conversation, $start = -1, $limit = 10)
     {
         //@todo napraviti da u jedan msg block ne moze biti vise od 30 poruka tj. ovisi o contentu.
         // limit na content po msg bloku napraviti.
 
-        $orderBy = null;
+        $orderBy = ['id' => 'ASC'];
         if($start == -1)
         {
-            $orderBy = ['id' => 'DESC'];
             $start = null;
         }
 
@@ -51,7 +50,7 @@ class MessageHandler
             $orderBy, // orderBy
             $limit,
             $start
-        )->getValues();
+        );
     }
 
     public function insertMessage($msg, Conversation $conversation, $params = array())
