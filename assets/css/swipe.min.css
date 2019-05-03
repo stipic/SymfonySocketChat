@@ -2344,6 +2344,11 @@ input:checked+.slider:before {
 		padding: 30px 0
 	}
 }
+.humburger-menu, 
+.closebtn 
+{
+	display: none;
+}
 
 @media (max-width:991px) {
 	body {
@@ -2392,14 +2397,39 @@ input:checked+.slider:before {
 		margin-bottom: 0
 	}
 	.sidebar {
-		padding: 30px 0 0;
+		height: 100%;
+		width: 0;
+		position: fixed;
+		z-index: 1;
+		top: 0;
+		left: 0;
+		overflow-x: hidden;
+		transition: 0.5s;
+		/*padding: 30px 0 0;
 		height: 100%;
 		min-height: 100px;
 		max-height: 600px;
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
 		-ms-overflow-style: none;
-		overflow-x: hidden
+		overflow-x: hidden*/
+	}
+	
+	.humburger-menu {
+		display: block;
+		font-size:30px;
+		margin-right: 10px;
+		color: black;
+		cursor:pointer
+	}
+	.closebtn {
+		display: block;
+		margin-right: 15px;
+		font-size:35px;
+		color: black;
+		text-align: right;
+		display: block;
+		cursor: pointer;
 	}
 	.sidebar::-webkit-scrollbar {
 		display: none
@@ -2433,7 +2463,7 @@ input:checked+.slider:before {
 		padding: 20px 0
 	}
 	.main .chat .content {
-		height: 310px
+		height: calc(100vh - 150px);
 	}
 }
 

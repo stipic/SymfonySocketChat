@@ -6,6 +6,16 @@
                     <div class="container">
                         <div class="col-md-12">
                             <div class="inside">
+                                <span class="humburger-menu" onclick="openNav()">&#9776;</span>
+                                <script>
+                                function openNav() {
+                                document.getElementById("sidebar").style.width = "250px";
+                                }
+
+                                function closeNav() {
+                                document.getElementById("sidebar").style.width = "0";
+                                }
+                                </script>
                                 <img class="avatar-md" src="/avatar.jpg" data-toggle="tooltip" data-placement="top" title="" alt="avatar" data-original-title="{{ conversations.current.title }}">
                                 <div class="data">
                                     <h5><a href="#">{{ conversations.current.title }}</a></h5>
