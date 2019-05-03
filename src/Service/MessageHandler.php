@@ -110,6 +110,7 @@ class MessageHandler
                 $msgTemplate = [
                     'template' => $this->_twig->render('inc/message-item.inc.html.twig', array(
                         'messageBlock' => [
+                            'id' => $messageBlock->getId(),
                             'createdBy' => $user,
                             'getCreatedAt' => new \DateTime(),
                             'messages' => [$message]
