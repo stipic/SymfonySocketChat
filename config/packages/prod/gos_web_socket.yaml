@@ -2,6 +2,7 @@ gos_web_socket:
     server:
         port: 5510
         host: 0.0.0.0
+        # host: 127.0.0.1
         router:
            resources:
                - '%kernel.project_dir%/config/pubsub.yml'
