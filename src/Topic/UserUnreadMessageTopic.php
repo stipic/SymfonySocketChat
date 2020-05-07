@@ -10,6 +10,8 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Gos\Bundle\WebSocketBundle\Topic\PushableTopicInterface;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 
 class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, PushableTopicInterface
 {
@@ -17,13 +19,24 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
 
     private $_em;
 
-    public function __construct(ClientManipulator $clientManipulator, EntityManager $em)
+    public function __construct(
+        ClientManipulatorInterface $clientManipulator, 
+        EntityManagerInterface $em
+    )
     {
         $this->clientManipulator = $clientManipulator;
         $this->_em = $em;
     }
 
-    public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
+    public function secure(
+        ?ConnectionInterface $connection,
+        Topic $topic,
+        WampRequest $request,
+        $payload = null,
+        ?array $exclude = [],
+        ?array $eligible = null,
+        ?string $provider = null
+    ): void
     {
         if($connection !== null)
         {
@@ -43,7 +56,7 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
         }
     }
 
-    public function onPush(Topic $topic, $request, $payload, $provider)
+    public function onPush(Topic $topic, WampRequest $request, $payload, string $provider): void
     {
         $responsePayload = '';
         if(isset($payload['userId']))
@@ -133,7 +146,7 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
      * Like RPC is will use to prefix the channel
      * @return string
      */
-    public function getName()
+    public function getName() : string
     {
         return 'user_unread_message.topic';
     }

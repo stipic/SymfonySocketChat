@@ -28,8 +28,8 @@ services:
     app_session_db_storage:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments:
-            - !service { class: PDO, factory: 'database_connection:getWrappedConnection' }
-            - {lock_mode: 0}
+            - 'mysql:dbname=chatter;'
+            - { db_table: 'sessions', db_username: 'root', db_password: 'm11' }
 
     craue_config_cache_provider:
         class: Doctrine\Common\Cache\FilesystemCache
@@ -41,19 +41,19 @@ services:
 
     app_conversation_socket:
         class: App\Topic\ConversationTopic
-        arguments: ['@gos_web_socket.websocket.client_manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker', "@gos_web_socket.zmq.pusher"]
+        arguments: ['@gos_web_socket.client.manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker', "@service_container"]
         tags:
             - { name: gos_web_socket.topic }
 
     conversation.topic:
         class: App\Topic\ConversationNotificationTopic
-        arguments: ['@gos_web_socket.websocket.client_manipulator']
+        arguments: ['@gos_web_socket.client.manipulator']
         tags:
             - { name: gos_web_socket.topic }
 
     app_online_users_socket:
         class: App\Topic\OnlineUserTopic
-        arguments: ['@gos_web_socket.websocket.client_manipulator']
+        arguments: ['@gos_web_socket.client.manipulator']
         tags:
             - { name: gos_web_socket.topic }
 
@@ -77,17 +77,17 @@ services:
 
     app_message_handler:
         class: App\Service\MessageHandler
-        arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.zmq.pusher", "@templating", "@app.message_parser"]
+        arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.pusher.amqp", "@twig", "@app.message_parser"]
         public: true
 
     app_conversation_handler:
         class: App\Service\ConversationHandler
-        arguments: ["@router", "@doctrine.orm.entity_manager", "@gos_web_socket.zmq.pusher", "@templating"]
+        arguments: ["@router", "@doctrine.orm.entity_manager", "@gos_web_socket.pusher.amqp", "@twig"]
         public: true
 
     app_user_unread_message_socket:
         class: App\Topic\UserUnreadMessageTopic
-        arguments: ['@gos_web_socket.websocket.client_manipulator', "@doctrine.orm.entity_manager"]
+        arguments: ['@gos_web_socket.client.manipulator', "@doctrine.orm.entity_manager"]
         tags:
             - { name: gos_web_socket.topic }
 
@@ -100,12 +100,6 @@ services:
     app.message_parser:
         public: true
         class: App\EventListener\MessageParserListener
-        arguments: ['@templating']
+        arguments: ['@twig']
         tags:
             - { name: doctrine.event_listener, event: postLoad }
-
-    admin.user:
-        class: App\Admin\UserAdmin
-        arguments: [~, App\Entity\User, ~]
-        tags:
-            - { name: sonata.admin, manager_type: orm, group: 'Content', label: 'User' }

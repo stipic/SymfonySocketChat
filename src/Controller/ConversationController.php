@@ -1,23 +1,17 @@
 <?php
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Conversation;
-use App\Form\ConversationFormType;
-use App\Service\ConversationHandler;
 use App\Entity\User;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ConversationController extends Controller
+class ConversationController extends AbstractController
 {
     /**
-     * @Route("/channel/new/{id}", name="app_new_channel", condition="request.isXmlHttpRequest()")
-     * @Method({"POST"})
+     * @Route("/channel/new/{id}", name="app_new_channel", condition="request.isXmlHttpRequest()", methods={"POST"})
      */
     public function newChannel(Conversation $currentConversation, Request $request)
     {
@@ -79,8 +73,7 @@ class ConversationController extends Controller
     }
 
     /**
-     * @Route("/conversation/{id}", name="app_conversation")
-     * @Method({"GET"})
+     * @Route("/conversation/{id}", name="app_conversation", methods={"GET"})
      */
     public function conversation(Conversation $conversation, Request $request)
     {

@@ -10,7 +10,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
-    private const USER_PASSWORD = '$2y$13$tiPZRrMWPHe2xp3qDhLt1e0J0Kayy8.m2G5LjV83uWeMXmjD0X8J2';
+    private const USER_PASSWORD = '$2y$13$tiPZRrMWPHe2xp3qDhLt1e0J0Kayy8.m2G5LjV83uWeMXmjD0X8J2'; // 123321
 
     public function load(ObjectManager $manager)
     {

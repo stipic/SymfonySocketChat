@@ -2,8 +2,8 @@
 namespace App\EventListener;
 
 use App\Entity\Message;
-use Symfony\Bundle\TwigBundle\TwigEngine;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Twig\Environment;
 
 class MessageParserListener 
 {
@@ -13,7 +13,7 @@ class MessageParserListener
 
     private $_fileInfo;
 
-    public function __construct(TwigEngine $twig)
+    public function __construct(Environment $twig)
     {
         $this->_parser = new \JBBCode\Parser();
         $this->_twig = $twig;

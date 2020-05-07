@@ -1,18 +1,23 @@
 <?php
 namespace App\Topic;
 
-use Gos\Bundle\WebSocketBundle\Topic\TopicInterface;
-use Gos\Bundle\WebSocketBundle\Router\WampRequest;
-use Gos\Bundle\WebSocketBundle\Topic\SecuredTopicInterface;
-use Gos\Bundle\WebSocketBundle\Server\Exception\FirewallRejectionException;
-use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
-use Ratchet\ConnectionInterface;
-use Gos\Bundle\WebSocketBundle\Topic\PushableTopicInterface;
-
 use Ratchet\Wamp\Topic;
-use Ratchet\MessageComponentInterface;
 use Doctrine\ORM\EntityManager;
+use Ratchet\ConnectionInterface;
+use Ratchet\MessageComponentInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use Gos\Bundle\WebSocketBundle\Router\WampRequest;
+use Gos\Bundle\WebSocketBundle\Topic\TopicInterface;
+
+use Gos\Bundle\WebSocketBundle\Pusher\Amqp\AmqpPusher;
+use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
+use Gos\Bundle\WebSocketBundle\Topic\SecuredTopicInterface;
+use Gos\Bundle\WebSocketBundle\Topic\PushableTopicInterface;
+use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Gos\Bundle\WebSocketBundle\Server\Exception\FirewallRejectionException;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ConversationTopic implements TopicInterface, SecuredTopicInterface, PushableTopicInterface
 {
@@ -24,17 +29,30 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
 
     private $_conversation;
 
-    private $_zmqPusher;
+    private $_amqpPusher;
 
-    public function __construct(ClientManipulator $clientManipulator, EntityManager $em, AuthorizationChecker $authChecker, $pusher)
+    public function __construct(
+        ClientManipulatorInterface $clientManipulator, 
+        EntityManagerInterface $em, 
+        AuthorizationCheckerInterface $authChecker, 
+        ContainerInterface $container
+    )
     {
         $this->clientManipulator = $clientManipulator;
         $this->_em = $em;
         $this->_authChecker = $authChecker;
-        $this->_zmqPusher = $pusher;
+        $this->_amqpPusher = $container->get('gos_web_socket.pusher.amqp');
     }
 
-    public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
+    public function secure(
+        ?ConnectionInterface $connection,
+        Topic $topic,
+        WampRequest $request,
+        $payload = null,
+        ?array $exclude = [],
+        ?array $eligible = null,
+        ?string $provider = null
+    ): void
     {
         if($connection !== null)
         {
@@ -68,7 +86,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
         }
     }
 
-    public function onPush(Topic $topic, $request, $payload, $provider)
+    public function onPush(Topic $topic, WampRequest $request, $payload, string $provider): void
     {
         if(isset($payload['unreadParams']))
         {
@@ -108,7 +126,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
                             'userId' => $userInConversation->getId()
                         ];
 
-                        $this->_zmqPusher->push($receiverPayload, 'app_unread_messages', ['username' => $userInConversation->getUsername()]);
+                        $this->_amqpPusher->push($receiverPayload, 'app_unread_messages', ['username' => $userInConversation->getUsername()]);
                     }
                 }
             }
@@ -166,7 +184,7 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
     * Like RPC is will use to prefix the channel
     * @return string
     */
-    public function getName()
+    public function getName() : string
     {
         return 'conversation.topic';
     }

@@ -18,8 +18,8 @@ framework:
     php_errors:
         log: true
 
-    templating:
-        engines:
-            twig
+    # templating:
+    #     engines:
+    #         twig
 
     translator: { fallbacks: ['%locale%'] }

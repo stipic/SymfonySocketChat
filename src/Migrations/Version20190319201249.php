@@ -25,7 +25,7 @@ final class Version20190319201249 extends AbstractMigration
             `sess_id` VARCHAR(128) NOT NULL PRIMARY KEY,
             `sess_data` BLOB NOT NULL,
             `sess_time` INTEGER UNSIGNED NOT NULL,
-            `sess_lifetime` MEDIUMINT NOT NULL
+            `sess_lifetime` INTEGER UNSIGNED NOT NULL
         ) COLLATE utf8_bin, ENGINE = InnoDB;');
         $this->addSql('CREATE TABLE groups (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(30) NOT NULL, role VARCHAR(20) NOT NULL, UNIQUE INDEX UNIQ_F06D397057698A6A (role), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
         $this->addSql('CREATE TABLE messages (id INT AUTO_INCREMENT NOT NULL, created_by INT DEFAULT NULL, updated_by INT DEFAULT NULL, created_at DATETIME NOT NULL, content LONGTEXT NOT NULL, deleted TINYINT(1) NOT NULL, messageBlock INT DEFAULT NULL, INDEX IDX_DB021E96B66A53E4 (messageBlock), INDEX IDX_DB021E96DE12AB56 (created_by), INDEX IDX_DB021E9616FE72E1 (updated_by), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');

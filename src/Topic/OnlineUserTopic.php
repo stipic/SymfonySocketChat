@@ -6,6 +6,7 @@ use Gos\Bundle\WebSocketBundle\Router\WampRequest;
 use Gos\Bundle\WebSocketBundle\Topic\SecuredTopicInterface;
 use Gos\Bundle\WebSocketBundle\Server\Exception\FirewallRejectionException;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulator;
+use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Ratchet\MessageComponentInterface;
@@ -17,12 +18,20 @@ class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
 
     private $_onlineUsers = array();
 
-    public function __construct(ClientManipulator $clientManipulator)
+    public function __construct(ClientManipulatorInterface $clientManipulator)
     {
         $this->clientManipulator = $clientManipulator;
     }
 
-    public function secure(ConnectionInterface $connection = null, Topic $topic, WampRequest $request, $payload = null, $exclude = null, $eligible = null, $provider = null)
+    public function secure(
+        ?ConnectionInterface $connection,
+        Topic $topic,
+        WampRequest $request,
+        $payload = null,
+        ?array $exclude = [],
+        ?array $eligible = null,
+        ?string $provider = null
+    ): void
     {
         if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
         {
@@ -81,7 +90,7 @@ class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
     * Like RPC is will use to prefix the channel
     * @return string
     */
-    public function getName()
+    public function getName() : string
     {
         return 'online_user.topic';
     }

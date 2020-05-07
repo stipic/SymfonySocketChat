@@ -25,20 +25,22 @@ class DoctrinePeriodicPing implements PeriodicInterface, LoggerAwareInterface
     /**
      * @param Connection|PingableConnection $connection
      */
-    public function __construct($connection)
+    public function __construct(
+        // PingableConnection $connection
+    )
     {
-        if (!($connection instanceof Connection) && !($connection instanceof PingableConnection)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The connection must be a subclass of %s or implement %s, %s does not fulfill these requirements.',
-                    Connection::class,
-                    PingableConnection::class,
-                    get_class($connection)
-                )
-            );
-        }
+        // if (!($connection instanceof Connection) && !($connection instanceof PingableConnection)) {
+        //     throw new \InvalidArgumentException(
+        //         sprintf(
+        //             'The connection must be a subclass of %s or implement %s, %s does not fulfill these requirements.',
+        //             Connection::class,
+        //             PingableConnection::class,
+        //             get_class($connection)
+        //         )
+        //     );
+        // }
 
-        $this->connection = $connection;
+        $this->connection = null;
     }
 
     /**
@@ -49,7 +51,7 @@ class DoctrinePeriodicPing implements PeriodicInterface, LoggerAwareInterface
         $this->timeout = $timeout;
     }
 
-    public function tick()
+    public function tick() : void
     {
         try {
             $startTime = microtime(true);
@@ -79,7 +81,7 @@ class DoctrinePeriodicPing implements PeriodicInterface, LoggerAwareInterface
     /**
      * @return int
      */
-    public function getTimeout()
+    public function getTimeout() : int
     {
         return $this->timeout;
     }

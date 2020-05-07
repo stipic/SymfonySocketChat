@@ -1,28 +1,21 @@
 app_topic_chat:
     channel: 'conversation/{conversationId}'
-    handler:
-        callback: 'conversation.topic'
+    handler: 'conversation.topic'
     requirements:
-        conversationId:
-            pattern: '\d+'
+        conversationId: '\d+'
 
 app_topic_chat_writing_notification:
     channel: 'conversation/{conversationId}/notifications'
-    handler:
-        callback: 'writing_notification.topic'
+    handler: 'writing_notification.topic'
     requirements:
-        conversationId:
-            pattern: '\d+'
+        conversationId: '\d+'
 
 app_online_users:
     channel: 'online'
-    handler:
-        callback: 'online_user.topic'
+    handler: 'online_user.topic'
 
 app_unread_messages:
     channel: 'unreaded/{username}'
-    handler:
-        callback: 'user_unread_message.topic'
+    handler: 'user_unread_message.topic'
     requirements:
-        username:
-            pattern: '[a-z]+'
+        username: '[a-z]+'

@@ -4,12 +4,13 @@ namespace App\Entity;
 use Symfony\Component\Security\Core\Role\Role;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\Authorization\Voter\RoleVoter;
 
 /**
  * @ORM\Table(name="groups")
  * @ORM\Entity()
  */
-class Group extends Role
+class Group extends RoleVoter
 {
     /**
      * @ORM\Column(name="id", type="integer")

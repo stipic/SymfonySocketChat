@@ -1,21 +1,20 @@
 <?php
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use App\Entity\Message;
 use App\Entity\Conversation;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\ConversationHandler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class MessageController extends Controller
+class MessageController extends AbstractController
 {
     /**
-     * @Route("/message/{id}/new", name="app_new_message", condition="request.isXmlHttpRequest()")
-     * @Method({"POST"})
+     * @Route("/message/{id}/new", name="app_new_message", condition="request.isXmlHttpRequest()", methods={"POST"})
      */
     public function newMessage(Conversation $conversation, Request $request)
     {
@@ -30,8 +29,7 @@ class MessageController extends Controller
     }
 
     /**
-     * @Route("/message/{id}/section", name="app_conversation_messages", condition="request.isXmlHttpRequest()")
-     * @Method({"GET"})
+     * @Route("/message/{id}/section", name="app_conversation_messages", condition="request.isXmlHttpRequest()", methods={"GET"})
      */
     public function getConversationSection(Conversation $conversation, Request $request)
     {
@@ -52,8 +50,7 @@ class MessageController extends Controller
     }
 
     /**
-     * @Route("/message/{id}/from/{startOffset}", name="app_conversation_messages_by_offset", condition="request.isXmlHttpRequest()")
-     * @Method({"GET"})
+     * @Route("/message/{id}/from/{startOffset}", name="app_conversation_messages_by_offset", condition="request.isXmlHttpRequest()", methods={"GET"})
      */
     public function getMessageBlocksByOffset(Conversation $conversation, int $startOffset, Request $request)
     {

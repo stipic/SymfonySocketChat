@@ -7,6 +7,7 @@ use App\Entity\User;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Doctrine\Common\Persistence\ObjectManager;
 use App\EventListener\MessageParserListener;
+use Twig\Environment;
 
 class MessageHandler 
 {
@@ -18,7 +19,11 @@ class MessageHandler
     
     private $_messageParser;
 
-    public function __construct(ObjectManager $em, $pusher, TwigEngine $twig, MessageParserListener $messageParser) 
+    public function __construct(
+        ObjectManager $em, $pusher, 
+        Environment $twig, 
+        MessageParserListener $messageParser
+    ) 
     {
         $this->_em = $em;
         $this->_zmqPusher = $pusher;
