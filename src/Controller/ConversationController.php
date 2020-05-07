@@ -16,7 +16,11 @@ class ConversationController extends AbstractController
     /**
      * @Route("/channel/new/{id}", name="app_new_channel", condition="request.isXmlHttpRequest()", methods={"POST"})
      */
-    public function newChannel(Conversation $currentConversation, Request $request)
+    public function newChannel(
+        Conversation $currentConversation, 
+        Request $request,
+        ConversationHandler $conversationHandler
+    )
     {
         $this->denyAccessUnlessGranted('ROLE_MODERATOR');
 
@@ -59,7 +63,6 @@ class ConversationController extends AbstractController
 
         if(!empty($users) && is_array($users))
         {
-            $conversationHandler = $this->get('app_conversation_handler');
             list($response['success'], $response['data']['errors']) = $conversationHandler->createNewConversation(
                 $channelName,
                 $this->getUser(),

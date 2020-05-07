@@ -57,15 +57,15 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
-    app_doctrine_periodic_ping:
-        class: App\Topic\Periodic\DoctrinePeriodicPing
-        arguments: ['@doctrine.dbal.default_connection']
-        tags:
-            - { name: gos_web_socket.periodic }
+    # app_doctrine_periodic_ping:
+    #     class: App\Topic\Periodic\DoctrinePeriodicPing
+    #     arguments: ['@doctrine.dbal.default_connection']
+    #     tags:
+    #         - { name: gos_web_socket.periodic }
     
     app_upload_listener:
         class: App\EventListener\ConversationUploadListener
-        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag", "@app_message_handler"]
+        arguments: ["@doctrine.orm.entity_manager", "@security.authorization_checker", "@security.token_storage", "@parameter_bag"]
         tags:
             - { name: kernel.event_listener, event: oneup_uploader.post_upload, method: afterUpload }
             - { name: kernel.event_listener, event: oneup_uploader.pre_upload, method: beforeUpload }
@@ -75,10 +75,10 @@ services:
         class: App\EventListener\UploadNamer
         # arguments: ["@security.token_storage"]
 
-    app_message_handler:
-        class: App\Service\MessageHandler
-        arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.pusher.amqp", "@twig", "@app.message_parser"]
-        public: true
+    # app_message_handler:
+    #     class: App\Service\MessageHandler
+    #     arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.pusher.amqp", "@twig", "@app.message_parser"]
+    #     public: true
 
     app_user_unread_message_socket:
         class: App\Topic\UserUnreadMessageTopic
@@ -98,3 +98,11 @@ services:
         arguments: ['@twig']
         tags:
             - { name: doctrine.event_listener, event: postLoad }
+
+    App\Service\ConversationHandler:
+        arguments:
+            '$amqpPusher': '@gos_web_socket.pusher.amqp'
+    
+    App\Service\MessageHandler:
+        arguments:
+            '$amqpPusher': '@gos_web_socket.pusher.amqp'

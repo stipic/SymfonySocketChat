@@ -21,16 +21,16 @@ class ConversationHandler
     private $_twig;
 
     public function __construct(
+        $amqpPusher, 
         RouterInterface $router, 
         EntityManagerInterface $em, 
-        $zmqPusher, 
         Environment $twig
     )
     {
         $this->_router = $router;
         $this->_em = $em;
         $this->_validator = Validation::createValidator();
-        $this->_zmqPusher = $zmqPusher;
+        $this->_zmqPusher = $amqpPusher;
         $this->_twig = $twig;
     }
 

@@ -7,6 +7,8 @@ use App\Entity\User;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Doctrine\Common\Persistence\ObjectManager;
 use App\EventListener\MessageParserListener;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\Entity;
 use Twig\Environment;
 
 class MessageHandler 
@@ -20,13 +22,14 @@ class MessageHandler
     private $_messageParser;
 
     public function __construct(
-        ObjectManager $em, $pusher, 
+        $amqpPusher, 
+        EntityManagerInterface $em, 
         Environment $twig, 
         MessageParserListener $messageParser
     ) 
     {
         $this->_em = $em;
-        $this->_zmqPusher = $pusher;
+        $this->_zmqPusher = $amqpPusher;
         $this->_twig = $twig;
         $this->_messageParser = $messageParser;
     }

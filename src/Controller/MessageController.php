@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Entity\Message;
 use App\Entity\Conversation;
 use App\Service\ConversationHandler;
+use App\Service\MessageHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,11 +17,10 @@ class MessageController extends AbstractController
     /**
      * @Route("/message/{id}/new", name="app_new_message", condition="request.isXmlHttpRequest()", methods={"POST"})
      */
-    public function newMessage(Conversation $conversation, Request $request)
+    public function newMessage(Conversation $conversation, Request $request, MessageHandler $messageHandler)
     {
         $this->denyAccessUnlessGranted('access', $conversation);
         $msg = $request->request->get('message');
-        $messageHandler = $this->get('app_message_handler');
         list($message, $messageView) = $messageHandler->insertMessage($msg, $conversation, array(
             'createdBy' => $this->getUser()
         ));
@@ -31,14 +31,13 @@ class MessageController extends AbstractController
     /**
      * @Route("/message/{id}/section", name="app_conversation_messages", condition="request.isXmlHttpRequest()", methods={"GET"})
      */
-    public function getConversationSection(Conversation $conversation, Request $request)
+    public function getConversationSection(Conversation $conversation, MessageHandler $messageHandler)
     {
         $this->denyAccessUnlessGranted('access', $conversation);
 
         $conversationHandler = $this->get('app_conversation_handler');
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
-        $messageHandler = $this->get('app_message_handler');
         $sortedMessages = $messageHandler->getMessageBlocks($conversation);
 
         // update unreaded messages.
@@ -52,11 +51,10 @@ class MessageController extends AbstractController
     /**
      * @Route("/message/{id}/from/{startOffset}", name="app_conversation_messages_by_offset", condition="request.isXmlHttpRequest()", methods={"GET"})
      */
-    public function getMessageBlocksByOffset(Conversation $conversation, int $startOffset, Request $request)
+    public function getMessageBlocksByOffset(Conversation $conversation, MessageHandler $messageHandler, int $startOffset)
     {
         $this->denyAccessUnlessGranted('access', $conversation);
 
-        $messageHandler = $this->get('app_message_handler');
         $sortedMessages = $messageHandler->getMessageBlocks($conversation, $startOffset);
 
         //@todo render msgs & return
