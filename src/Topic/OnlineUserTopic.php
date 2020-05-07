@@ -33,10 +33,10 @@ class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
         ?string $provider = null
     ): void
     {
-        if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
-        {
-            throw new FirewallRejectionException();
-        }
+        // if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
+        // {
+        //     throw new FirewallRejectionException();
+        // }
     }
 
     /**
@@ -67,7 +67,7 @@ class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
         $user = $this->clientManipulator->getClient($connection);
-        $this->_onlineUsers[$user->getId()] = $user->getUsername();
+        $this->_onlineUsers[$user->getUser()->getId()] = $user->getUsername();
         $topic->broadcast(json_encode($this->_onlineUsers));
     }
 
@@ -82,7 +82,7 @@ class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
     public function onUnSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
         $user = $this->clientManipulator->getClient($connection);
-        unset($this->_onlineUsers[$user->getId()]);
+        unset($this->_onlineUsers[$user->getUser()->getId()]);
         $topic->broadcast(json_encode($this->_onlineUsers));
     }
 

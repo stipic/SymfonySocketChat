@@ -38,22 +38,22 @@ class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, P
         ?string $provider = null
     ): void
     {
-        if($connection !== null)
-        {
-            $pubSubRouteChunk = explode('/', $topic->getId());
-            if(
-                !$this->clientManipulator->getClient($connection) instanceof \App\Entity\User ||
-                !isset($pubSubRouteChunk[1]) || // username
-                $pubSubRouteChunk[1] != $this->clientManipulator->getClient($connection)->getUsername()
-            ) 
-            {
-                throw new FirewallRejectionException();
-            }
-        }
-        else 
-        {
-            // ZmqPusher
-        }
+        // if($connection !== null)
+        // {
+        //     $pubSubRouteChunk = explode('/', $topic->getId());
+        //     if(
+        //         !$this->clientManipulator->getClient($connection) instanceof \App\Entity\User ||
+        //         !isset($pubSubRouteChunk[1]) || // username
+        //         $pubSubRouteChunk[1] != $this->clientManipulator->getClient($connection)->getUsername()
+        //     ) 
+        //     {
+        //         throw new FirewallRejectionException();
+        //     }
+        // }
+        // else 
+        // {
+        //     // ZmqPusher
+        // }
     }
 
     public function onPush(Topic $topic, WampRequest $request, $payload, string $provider): void

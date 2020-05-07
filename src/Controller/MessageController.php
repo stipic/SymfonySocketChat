@@ -31,11 +31,14 @@ class MessageController extends AbstractController
     /**
      * @Route("/message/{id}/section", name="app_conversation_messages", condition="request.isXmlHttpRequest()", methods={"GET"})
      */
-    public function getConversationSection(Conversation $conversation, MessageHandler $messageHandler)
+    public function getConversationSection(
+        Conversation $conversation, 
+        MessageHandler $messageHandler,
+        ConversationHandler $conversationHandler
+    )
     {
         $this->denyAccessUnlessGranted('access', $conversation);
 
-        $conversationHandler = $this->get('app_conversation_handler');
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
         $sortedMessages = $messageHandler->getMessageBlocks($conversation);

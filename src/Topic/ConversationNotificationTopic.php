@@ -32,10 +32,10 @@ class ConversationNotificationTopic implements TopicInterface, SecuredTopicInter
         ?string $provider = null
     ): void
     {
-        if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
-        {
-            throw new FirewallRejectionException();
-        }
+        // if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
+        // {
+        //     throw new FirewallRejectionException();
+        // }
 
         // ne zelimo raditi bzvz upit na bazu dali korisnik ima prava 'access' na ovaj conversation
         // pošto je bezopasno, odnosno ako se i uspije spojiti znamo da je to vec neki postojeci korisnik

@@ -39,11 +39,11 @@ services:
             - 'craue_config'
             - 0
 
-    app_conversation_socket:
-        class: App\Topic\ConversationTopic
-        arguments: ['@gos_web_socket.client.manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker', "@service_container"]
-        tags:
-            - { name: gos_web_socket.topic }
+    # app_conversation_socket:
+    #     class: App\Topic\ConversationTopic
+    #     arguments: ['@gos_web_socket.client.manipulator', '@doctrine.orm.entity_manager', '@security.authorization_checker', "@service_container"]
+    #     tags:
+    #         - { name: gos_web_socket.topic }
 
     conversation.topic:
         class: App\Topic\ConversationNotificationTopic
@@ -104,5 +104,9 @@ services:
             '$amqpPusher': '@gos_web_socket.pusher.amqp'
     
     App\Service\MessageHandler:
+        arguments:
+            '$amqpPusher': '@gos_web_socket.pusher.amqp'
+
+    App\Topic\ConversationTopic:
         arguments:
             '$amqpPusher': '@gos_web_socket.pusher.amqp'

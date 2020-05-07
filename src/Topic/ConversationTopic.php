@@ -32,16 +32,16 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
     private $_amqpPusher;
 
     public function __construct(
+        $amqpPusher,
         ClientManipulatorInterface $clientManipulator, 
         EntityManagerInterface $em, 
-        AuthorizationCheckerInterface $authChecker, 
-        ContainerInterface $container
+        AuthorizationCheckerInterface $authChecker
     )
     {
         $this->clientManipulator = $clientManipulator;
         $this->_em = $em;
         $this->_authChecker = $authChecker;
-        $this->_amqpPusher = $container->get('gos_web_socket.pusher.amqp');
+        $this->_amqpPusher = $amqpPusher;
     }
 
     public function secure(
@@ -56,9 +56,9 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
     {
         if($connection !== null)
         {
-            if(!$this->clientManipulator->getClient($connection) instanceof \App\Entity\User)
+            if ($request->getAttributes()->has('denied')) 
             {
-                throw new FirewallRejectionException();
+                throw new FirewallRejectionException('Access denied');
             }
 
             $pubSubRouteChunk = explode('/', $topic->getId());
@@ -73,12 +73,12 @@ class ConversationTopic implements TopicInterface, SecuredTopicInterface, Pushab
                 'id' => $conversationId
             ));
 
-            if(!$this->_authChecker->isGranted('access', $this->_conversation))
-            {
-                // korisnik nema prava pristupa ovom razgovoru.
+            // if(!$this->_authChecker->isGranted('access', $this->_conversation))
+            // {
+            //     // korisnik nema prava pristupa ovom razgovoru.
 
-                throw new FirewallRejectionException();
-            }
+            //     throw new FirewallRejectionException();
+            // }
         }
         else 
         {

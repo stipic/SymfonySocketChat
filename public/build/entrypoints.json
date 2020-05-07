@@ -2,9 +2,9 @@
   "entrypoints": {
     "app": {
       "js": [
-        "/build/runtime.fa8f03f5.js",
-        "/build/0.a73f51e2.js",
-        "/build/app.08d382fc.js"
+        "/build/runtime.518d4a5c.js",
+        "/build/0.b3d77782.js",
+        "/build/app.7431b27f.js"
       ],
       "css": [
         "/build/app.801b79b9.css"
@@ -12,13 +12,13 @@
     },
     "conversation": {
       "js": [
-        "/build/runtime.fa8f03f5.js",
-        "/build/0.a73f51e2.js",
-        "/build/1.1925f216.js",
-        "/build/conversation.07d7f8e5.js"
+        "/build/runtime.518d4a5c.js",
+        "/build/0.b3d77782.js",
+        "/build/1.7e0bd29c.js",
+        "/build/conversation.ab0577ba.js"
       ],
       "css": [
-        "/build/1.b0a73051.css",
+        "/build/1.552b1706.css",
         "/build/conversation.801b79b9.css"
       ]
     }
