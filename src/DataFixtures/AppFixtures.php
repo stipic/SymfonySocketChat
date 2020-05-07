@@ -14,34 +14,11 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-        $groups = [
-            [
-                'name' => 'Admin',
-                'role' => 'ROLE_SUPERADMIN',
-            ],
-            [
-                'name' => 'Moderator',
-                'role' => 'ROLE_MODERATOR'
-            ],
-            [
-                'name' => 'User',
-                'role' => 'ROLE_USER'
-            ]
+        $roles = [
+            'ROLE_SUPERADMIN',
+            'ROLE_MODERATOR',
+            'ROLE_USER',
         ];
-
-        foreach(array_keys($groups) as $key)
-        {
-            $group = new Group();
-            $group->setName($groups[$key]['name']);
-            $group->setRole($groups[$key]['role']);
-
-            $manager->persist($group);
-
-            $referenceId = 'role-' . $key;
-            $this->addReference($referenceId, $group);
-        }
-
-        $manager->flush();
 
         $users = [
             // ADMINs
@@ -50,7 +27,7 @@ class AppFixtures extends Fixture
                 'password' => self::USER_PASSWORD,
                 'email' => 'kiki.stipic@gmail.com',
                 'displayName' => 'ExtremePower',
-                'group' => 0
+                'role' => $roles[0]
             ],
 
             // MODERATORs
@@ -60,7 +37,7 @@ class AppFixtures extends Fixture
                 'password' => self::USER_PASSWORD,
                 'email' => 'moderator@example.com',
                 'displayName' => 'Moderate Guy',
-                'group' => 1
+                'role' => $roles[1]
             ],
 
             // USERs
@@ -70,7 +47,7 @@ class AppFixtures extends Fixture
                 'password' => self::USER_PASSWORD,
                 'email' => 'user@example.com',
                 'displayName' => 'User Guy',
-                'group' => 2
+                'role' => $roles[2]
             ]
 
         ];
@@ -82,10 +59,7 @@ class AppFixtures extends Fixture
             $user->setUsername($users[$key]['username']);
             $user->setPassword($users[$key]['password']);
             $user->setDisplayName($users[$key]['displayName']);
-
-            $groupReferenceId = 'role-' . $users[$key]['group'];
-            $group = $this->getReference($groupReferenceId);
-            $user->addGroup($group);
+            $user->setRole($users[$key]['role']);
 
             $referenceId = 'user-' . $key;
             $this->addReference($referenceId, $user);

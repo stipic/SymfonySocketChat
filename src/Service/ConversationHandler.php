@@ -1,13 +1,12 @@
 <?php
 namespace App\Service;
 
-use App\Entity\Conversation;
 use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Bundle\TwigBundle\TwigEngine;
+use Twig\Environment;
+use App\Entity\Conversation;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Routing\RouterInterface;
 
 class ConversationHandler
 {
@@ -21,7 +20,12 @@ class ConversationHandler
 
     private $_twig;
 
-    public function __construct(Router $router, ObjectManager $em, $zmqPusher, TwigEngine $twig)
+    public function __construct(
+        RouterInterface $router, 
+        EntityManagerInterface $em, 
+        $zmqPusher, 
+        Environment $twig
+    )
     {
         $this->_router = $router;
         $this->_em = $em;
@@ -193,5 +197,4 @@ class ConversationHandler
 
         return [$responseSuccess, $responseErrors];
     }
-
 }

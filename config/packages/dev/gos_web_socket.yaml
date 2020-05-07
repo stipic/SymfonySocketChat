@@ -9,21 +9,9 @@ gos_web_socket:
     client:
         firewall: main
         session_handler: app_session_db_storage
-    # origins:
-    #     - '%origin%'
 
     pushers:
-        # wamp:
-        #     host: 127.0.0.1
-        #     port: 5510
-
         amqp:
-            # default: true
-            # host: 127.0.0.1
-            # port: 5555
-            # persistent: true
-            # protocol: tcp
-
             enabled: true # Flag to enable this pusher
             host: 127.0.0.1 # Host address for the AMQP server
             port: 5672 # Port the AMQP server is listening on

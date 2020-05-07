@@ -63,15 +63,13 @@ class User implements UserInterface, \Serializable
     private $unreadedMessages;
 
     /**
-     * @ORM\ManyToMany(targetEntity="Group", inversedBy="users")
-     *
+     * @ORM\Column(name="roles", type="json", nullable=false)
      */
-    private $groups;
+    private $roles = [];
 
     public function __construct()
     {
         $this->conversations = new ArrayCollection();
-        $this->groups = new ArrayCollection();
         $this->unreadedMessages = new ArrayCollection();
     }
 
@@ -142,18 +140,6 @@ class User implements UserInterface, \Serializable
 
     public function getSalt()
     {
-    }
-
-    public function addGroup(\App\Entity\Group $group)
-    {
-        $this->groups[] = $group;
-
-        return $this;
-    }
-
-    public function getRoles()
-    {
-        return $this->groups->toArray();
     }
 
     public function eraseCredentials()
@@ -247,5 +233,25 @@ class User implements UserInterface, \Serializable
     public function getUnreadedMessages()
     {
         return $this->unreadedMessages;
+    }
+
+    /**
+     * Get the value of roles
+     */ 
+    public function getRoles() : array
+    {
+        return $this->roles;
+    }
+
+    /**
+     * Set the value of roles
+     *
+     * @return  self
+     */ 
+    public function setRole($role)
+    {
+        $this->roles[] = $role;
+
+        return $this;
     }
 }

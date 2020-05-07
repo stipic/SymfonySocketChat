@@ -5,6 +5,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Conversation;
 use App\Entity\User;
+use App\Service\ConversationHandler;
+use App\Service\MessageHandler;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -73,19 +76,21 @@ class ConversationController extends AbstractController
     }
 
     /**
-     * @Route("/conversation/{id}", name="app_conversation", methods={"GET"})
+     * @Route("/conversation/{id}", methods={"GET"}, name="app_conversation")
      */
-    public function conversation(Conversation $conversation, Request $request)
+    public function conversation(
+        Conversation $conversation,
+        ConversationHandler $conversationHandler,
+        MessageHandler $messageHandler,
+        EntityManagerInterface $em
+    )
     {
         $this->denyAccessUnlessGranted('access', $conversation);
         
-        $conversationHandler = $this->get('app_conversation_handler');
         $sortedConversations = $conversationHandler->getUserConversations($this->getUser(), $conversation);
 
-        $messageHandler = $this->get('app_message_handler');
         $messageBlocks = $messageHandler->getMessageBlocks($conversation);
 
-        $em = $this->get('doctrine')->getManager();
         $userRepository = $em->getRepository(User::class);
         $users = $userRepository->findAll();
         

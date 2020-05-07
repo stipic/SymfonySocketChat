@@ -28,8 +28,8 @@ services:
     app_session_db_storage:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments:
-            - 'mysql:dbname=chatter;'
-            - { db_table: 'sessions', db_username: 'root', db_password: 'm11' }
+            - '%env(resolve:DATABASE_URL)%'
+            # - { db_table: 'sessions', db_username: 'root', db_password: 'm11' }
 
     craue_config_cache_provider:
         class: Doctrine\Common\Cache\FilesystemCache
@@ -78,11 +78,6 @@ services:
     app_message_handler:
         class: App\Service\MessageHandler
         arguments: ["@doctrine.orm.entity_manager", "@gos_web_socket.pusher.amqp", "@twig", "@app.message_parser"]
-        public: true
-
-    app_conversation_handler:
-        class: App\Service\ConversationHandler
-        arguments: ["@router", "@doctrine.orm.entity_manager", "@gos_web_socket.pusher.amqp", "@twig"]
         public: true
 
     app_user_unread_message_socket:
