@@ -12,7 +12,7 @@ use Ratchet\Wamp\Topic;
 use Ratchet\MessageComponentInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
-class OnlineUserTopic implements TopicInterface, SecuredTopicInterface
+class OnlineUserTopic implements TopicInterface//, SecuredTopicInterface
 {
     protected $clientManipulator;
 

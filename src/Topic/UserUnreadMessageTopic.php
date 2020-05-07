@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 
-class UserUnreadMessageTopic implements TopicInterface, SecuredTopicInterface, PushableTopicInterface
+class UserUnreadMessageTopic implements TopicInterface/*, SecuredTopicInterface*/, PushableTopicInterface
 {
     protected $clientManipulator;
 

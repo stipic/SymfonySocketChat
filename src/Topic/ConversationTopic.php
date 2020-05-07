@@ -19,7 +19,7 @@ use Gos\Bundle\WebSocketBundle\Server\Exception\FirewallRejectionException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ConversationTopic implements TopicInterface, SecuredTopicInterface, PushableTopicInterface
+class ConversationTopic implements TopicInterface/*, SecuredTopicInterface*/, PushableTopicInterface
 {
     protected $clientManipulator;
 

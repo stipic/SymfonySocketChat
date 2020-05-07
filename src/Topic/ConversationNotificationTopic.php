@@ -11,7 +11,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Ratchet\MessageComponentInterface;
 
-class ConversationNotificationTopic implements TopicInterface, SecuredTopicInterface
+class ConversationNotificationTopic implements TopicInterface//, SecuredTopicInterface
 {
     protected $clientManipulator;
 
