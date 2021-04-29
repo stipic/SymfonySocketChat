@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\MessageBlock;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 /**
  * @method MessageBlock|null find($id, $lockMode = null, $lockVersion = null)
  * @method MessageBlock|null findOneBy(array $criteria, array $orderBy = null)

@@ -6,8 +6,7 @@ use App\Entity\User;
 use App\Entity\Conversation;
 use App\Entity\Message;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\Persistence\ObjectManager;
-
+use Doctrine\Persistence\ObjectManager;
 class AppFixtures extends Fixture
 {
     private const USER_PASSWORD = '$2y$13$tiPZRrMWPHe2xp3qDhLt1e0J0Kayy8.m2G5LjV83uWeMXmjD0X8J2'; // 123321

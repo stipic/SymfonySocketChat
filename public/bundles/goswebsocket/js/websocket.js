@@ -36,9 +36,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
  * @param {String} uri The URI that has been published to
  * @param {Object} payload The data payload for the publish event
  */
-var GosSocket =
-/*#__PURE__*/
-function () {
+var GosSocket = /*#__PURE__*/function () {
   /**
    * Create a new GosSocket instance
    *
@@ -76,9 +74,12 @@ function () {
     this._connect(uri, sessionConfig);
   }
   /**
-   * Retrieve the AutobahnJS API object
+   * Create a new connection
    *
-   * @returns {ab}
+   * @param {String} uri URI to open the connection to
+   * @param {{retryDelay: Number, maxRetries: Number, skipSubprotocolCheck: Boolean, skipSubprotocolAnnounce: Boolean}} sessionConfig Configuration object to forward to the Autobahn connect method
+   * @returns {GosSocket}
+   * @throws {Error} If AutobahnJS is not loaded
    */
 
 
@@ -281,6 +282,12 @@ function () {
     }
   }, {
     key: "autobahn",
+
+    /**
+     * Retrieve the AutobahnJS API object
+     *
+     * @returns {ab}
+     */
     get: function get() {
       return this._autobahn;
     }
@@ -295,14 +302,27 @@ function () {
     get: function get() {
       return this._session;
     }
+  }], [{
+    key: "connect",
+    value: function connect(uri) {
+      var sessionConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+      if (typeof global.ab === 'undefined') {
+        throw new Error('GosSocket requires AutobahnJS to be loaded.');
+      }
+
+      return new GosSocket(global.ab, uri, sessionConfig);
+    }
   }]);
 
   return GosSocket;
 }();
+/**
+ * @deprecated
+ */
 
-var WS =
-/*#__PURE__*/
-function () {
+
+var WS = /*#__PURE__*/function () {
   function WS() {
     _classCallCheck(this, WS);
   }
@@ -317,20 +337,17 @@ function () {
      * @param {{retryDelay: Number, maxRetries: Number, skipSubprotocolCheck: Boolean, skipSubprotocolAnnounce: Boolean}} sessionConfig Configuration object to forward to the Autobahn connect method
      * @returns {GosSocket}
      * @throws {Error} If AutobahnJS is not loaded
+     * @deprecated Use `GosSocket.connect()` instead
      */
     value: function connect(uri) {
       var sessionConfig = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-      if (typeof global.ab === 'undefined') {
-        throw new Error('GosSocket requires AutobahnJS to be loaded.');
-      }
-
-      return new GosSocket(global.ab, uri, sessionConfig);
+      return GosSocket.connect(uri, sessionConfig);
     }
     /**
      * Get the singleton instance of this object
      *
      * @returns {WS}
+     * @deprecated
      */
 
   }], [{
@@ -346,6 +363,7 @@ function () {
  * Singleton instance of the WS object
  *
  * @type {WS}
+ * @deprecated
  */
 
 

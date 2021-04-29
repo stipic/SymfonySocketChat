@@ -7,6 +7,7 @@ use App\Entity\Conversation;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class ConversationHandler
 {
@@ -16,12 +17,12 @@ class ConversationHandler
 
     private $_validator;
 
-    private $_zmqPusher;
+    private $_bus;
 
     private $_twig;
 
     public function __construct(
-        $amqpPusher, 
+        MessageBusInterface $bus, 
         RouterInterface $router, 
         EntityManagerInterface $em, 
         Environment $twig
@@ -30,7 +31,7 @@ class ConversationHandler
         $this->_router = $router;
         $this->_em = $em;
         $this->_validator = Validation::createValidator();
-        $this->_zmqPusher = $amqpPusher;
+        $this->_bus = $bus;
         $this->_twig = $twig;
     }
 
@@ -183,6 +184,19 @@ class ConversationHandler
                     'conversations' => $sortedConversations,
                 ));
                 $this->_zmqPusher->push($receiverPayload, 'app_unread_messages', ['username' => $user->getUsername()]);
+            
+                // $message = new ExportMessage($page, $this->getUser(), $exportType, $dryRun);
+                // $envelope = new Envelope($message);
+                // $envelope = $this->_bus->dispatch(
+                //     $envelope->with(
+                //         new SerializerStamp(
+                //             [
+                //                 'groups' => ['data']
+                //             ]
+                //         )
+                //     )
+                // );
+            
             }
 
             $responseSuccess = true;

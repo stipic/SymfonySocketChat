@@ -99,9 +99,9 @@ services:
         tags:
             - { name: doctrine.event_listener, event: postLoad }
 
-    App\Service\ConversationHandler:
-        arguments:
-            '$amqpPusher': '@gos_web_socket.pusher.amqp'
+    # App\Service\ConversationHandler:
+    #     arguments:
+    #         '$amqpPusher': '@gos_web_socket.pusher.amqp'
     
     App\Service\MessageHandler:
         arguments:

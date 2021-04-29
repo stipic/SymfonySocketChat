@@ -9,17 +9,3 @@ gos_web_socket:
     client:
         firewall: main
         session_handler: app_session_db_storage
-
-    pushers:
-        amqp:
-            enabled: true # Flag to enable this pusher
-            host: 127.0.0.1 # Host address for the AMQP server
-            port: 5672 # Port the AMQP server is listening on
-            login: guest # Required, the login for the AMQP server
-            password: guest # Required, the password for the AMQP server
-            vhost: / # The virtual host on the host, default `/`
-            read_timeout: 0 # Timeout for incoming activity in seconds, default 0
-            write_timeout: 0 # Timeout for outgoing activity in seconds, default 0
-            connect_timeout: 0 # Connection timeout in seconds, default 0
-            queue_name: gos_websocket # The name of the queue for messages, default `gos_websocket`
-            exchange_name: gos_websocket_exchange # The name of the exchange for messages, default `gos_websocket`

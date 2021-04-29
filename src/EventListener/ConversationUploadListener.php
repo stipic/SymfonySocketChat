@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use App\Service\MessageHandler;
 use App\Entity\File;
+use Doctrine\ORM\EntityManagerInterface;
 
 class ConversationUploadListener
 {
@@ -27,7 +28,7 @@ class ConversationUploadListener
     private $_messageHandler;
 
     public function __construct(
-        ObjectManager $em, 
+        EntityManagerInterface $em, 
         AuthorizationChecker $authChecker, 
         TokenStorageInterface $token, 
         ParameterBagInterface $params, 
